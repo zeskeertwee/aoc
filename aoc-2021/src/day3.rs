@@ -34,11 +34,7 @@ pub fn true_at_index(v: Input, idx: usize) -> bool {
 pub fn find_most_common(data: &[Input], idx: usize) -> bool {
     let count = data.iter().filter(|v| true_at_index(**v, idx)).count();
 
-    if count >= data.len() - count {
-        return true;
-    } else {
-        return false;
-    }
+    count >= data.len() - count
 }
 
 #[aoc(day3, part2)]
@@ -63,6 +59,11 @@ pub fn solve_part2(input: &[Input]) -> usize {
 
     assert_eq!(oxygen_rating.len(), 1);
     assert_eq!(co2_rating.len(), 1);
+    assert!(oxygen_rating[0] < 0b0000_1111_1111_1111);
+    assert!(input.contains(&co2_rating[0]));
+    assert!(co2_rating[0] < 0b0000_1111_1111_1111);
+    assert_ne!(oxygen_rating[0], co2_rating[0]);
+    println!("{:b}\n{:b}", oxygen_rating[0], co2_rating[0]);
 
     oxygen_rating[0] as usize * co2_rating[0] as usize
 }
@@ -80,14 +81,14 @@ pub fn split_using_index(data: &[Input], idx: usize) -> (Vec<Input>, Vec<Input>)
         })
         .fold(
             (Vec::new(), Vec::new()),
-            |(mut true_acc, mut false_acc), v| {
+            |(mut common_acc, mut uncommon_acc), v| {
                 match v {
-                    (Some(x), None) => true_acc.push(x),
-                    (None, Some(x)) => false_acc.push(x),
+                    (Some(x), None) => common_acc.push(x),
+                    (None, Some(x)) => uncommon_acc.push(x),
                     _ => unreachable!(),
                 }
 
-                (true_acc, false_acc)
+                (common_acc, uncommon_acc)
             },
         )
 }
