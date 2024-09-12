@@ -13,13 +13,35 @@ fn parse_input_day3(input: &str) -> Vec<(HashSet<char>, HashSet<char>)> {
 }
 
 #[aoc(day3, part1)]
-fn part1(input: &[(HashSet<char>, HashSet<char>)]) -> i32 {
+fn part1(input: &[(HashSet<char>, HashSet<char>)]) -> u32 {
     input.iter().map(|b| {
-        let c = b.0.intersection(&b.1).next().unwrap().to_owned() as u8;
-        if c.is_ascii_lowercase() {
-            c - ('b' as u8)
-        } else {
-            (c - ('B' as u8)) + 26
+        char_priority(b.0.intersection(&b.1).next().unwrap().to_owned())
+    }).map(|v| v as u32).sum()
+}
+
+#[aoc(day3, part2)]
+fn part2(input: &[(HashSet<char>, HashSet<char>)]) -> u32 {
+    input.chunks(3).map(|b| {
+        // iterate over every 3 lines and put all chars of that line into a hashset
+        let mut sets = Vec::new();
+        for i in b {
+            let set: HashSet<char> = HashSet::from_iter(i.0.union(&i.1).map(|v| *v).collect::<Vec<char>>());
+            sets.push(set);
         }
-    }).map(|v| v as i32).sum()
+
+        // take the intersection of the three hashsets and return the priority value
+        char_priority(*sets[1..].iter().fold(sets[0].clone(), |mut acc, set| {
+            acc.retain(|v| set.contains(v));
+            acc
+        }).iter().next().unwrap())
+    }).map(|v| v as u32).sum()
+}
+
+fn char_priority(c: char) -> u8 {
+    let c = c as u8;
+    if c.is_ascii_lowercase() {
+        c - ('a' as u8 - 1)
+    } else {
+        (c - ('A' as u8 - 1)) + 26
+    }
 }
