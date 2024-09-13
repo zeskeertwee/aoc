@@ -20,8 +20,8 @@ fn parse_input_day5(input: &str) -> Input {
         let chars: Vec<char> = l.chars().collect();
         for i in 0..9 {
             let value = chars[(i * 4) + 1];
-            if (value != ' ') {
-                if (value == '1') {
+            if value != ' ' {
+                if value == '1' {
                     break 'containers;
                 }
                 containers[i].push_front(value);
@@ -55,7 +55,7 @@ fn part1(input: &Input) -> String {
     let mut containers = input.containers.clone();
 
     for movement in input.movements.iter() {
-        for i in 0..movement.count {
+        for _ in 0..movement.count {
             let v  = containers[movement.source as usize].pop_back().unwrap();
             containers[movement.destination as usize].push_back(v);
         }
