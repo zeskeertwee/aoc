@@ -19,34 +19,15 @@ fn part1(input: &(Vec<u32>, Vec<u32>)) -> u32 {
     left.sort();
     right.sort();
 
-    let mut count = 0;
-
-    for i in 0..left.len() {
-        count += left[i].abs_diff(right[i]);
-    }
-
-    return count;
+    left.iter().zip(right).map(|(a, b)| a.abs_diff(b)).sum()
 }
 
 #[aoc(day1, part2)]
 fn part2(input: &(Vec<u32>, Vec<u32>)) -> u32 {
-    let mut left = HashMap::new();
-
+    let mut map = HashMap::new();
     for i in input.1.iter() {
-        let v = if let Some(val) = left.get(&i) {
-            val + 1
-        } else {
-            1
-        };
-
-        left.insert(i, v);
+        *map.entry(i).or_insert(0) += 1;
     }
 
-    let mut sum = 0;
-
-    for i in input.0.iter() {
-        sum += left.get(&i).unwrap_or(&0) * i;
-    }
-
-    sum
+    input.0.iter().map(|v| map.get(v).unwrap_or(&0) * v).sum()
 }
