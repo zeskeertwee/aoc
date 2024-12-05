@@ -1,5 +1,5 @@
-use std::cmp::{max, min};
 use aoc_runner_derive::{aoc, aoc_generator};
+use rayon::prelude::*;
 
 #[aoc_generator(day4)]
 fn parse_input_day4(input: &str) -> Vec<Vec<char>> {
@@ -12,6 +12,20 @@ fn part1(grid: &[Vec<char>]) -> u32 {
     + find_xmas(&rot_grid(grid))
     + find_xmas(&rot_grid(&diag_grid(grid, true)))
     + find_xmas(&rot_grid(&diag_grid(grid, false)))
+}
+
+#[aoc(day4, part1, rayon)]
+fn part1_rayon(grid: &[Vec<char>]) -> u32 {
+    let (mut a, mut b, mut c, mut d) = (0, 0, 0, 0);
+
+    rayon::scope(|s| {
+        s.spawn(|_| a = find_xmas(grid));
+        s.spawn(|_| b = find_xmas(&rot_grid(grid)));
+        s.spawn(|_| c = find_xmas(&rot_grid(&diag_grid(grid, true))));
+        s.spawn(|_| d = find_xmas(&rot_grid(&diag_grid(grid, false))));
+    });
+
+    a + b + c + d
 }
 
 #[aoc(day4, part2)]
