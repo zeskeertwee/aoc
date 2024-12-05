@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use std::iter::Iterator;
 use aoc_runner_derive::{aoc, aoc_generator};
 
@@ -7,7 +8,7 @@ struct Input {
     updates: Vec<Vec<u32>>
 }
 
-#[aoc_generator(day5, part1)]
+#[aoc_generator(day5)]
 fn parse_day5(input: &str) -> Input {
     let mut split: Vec<&str> = input.split("\n\n").collect();
 
@@ -24,6 +25,54 @@ fn parse_day5(input: &str) -> Input {
 
 #[aoc(day5, part1)]
 fn part1(input: &Input) -> u32 {
-    dbg!(&input);
-    0
+    let mut count = 0;
+
+    for update in &input.updates {
+        if is_correct_order(&input.rules, update) {
+            // correct, add middle page number to count
+            count += update[update.len()/2];
+        }
+    }
+
+    count
+}
+
+fn is_correct_order(rules: &Vec<(u32, u32)>, update: &[u32]) -> bool {
+    for (first, second) in rules {
+        let mut found_second = false;
+
+        for p in update {
+            if p == first {
+                if found_second == true {
+                    // first after second
+                    return false;
+                }
+            }
+
+            if p == second {
+                found_second = true;
+                // either we found it after first, or we didn't find first at all
+                // in both cases, good
+            }
+        }
+    }
+
+    true
+}
+
+#[aoc(day5, part2)]
+fn part2(input: &Input) -> u32 {
+    let mut updates = input.updates.clone();
+    updates.iter_mut()
+        .filter(|v| !is_correct_order(&input.rules, v))
+        .map(|v| {
+            v.sort_by(|a, b| {
+                match is_correct_order(&input.rules, &vec![*a, *b]) {
+                    true => Ordering::Less,
+                    false => Ordering::Greater
+                }
+            });
+
+            v[v.len()/2]
+        }).sum()
 }

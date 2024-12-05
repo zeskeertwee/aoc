@@ -8,19 +8,20 @@ fn parse_input_day4(input: &str) -> Vec<Vec<char>> {
 
 #[aoc(day4, part1)]
 fn part1(grid: &[Vec<char>]) -> u32 {
-    printgrid(grid);
+    //printgrid(grid);
+    //printgrid(&rot_grid(grid));
+    //printgrid(&rot_grid(&diag_grid(grid, true)));
+    //printgrid(&rot_grid(&diag_grid(grid, false)));
+    dbg!(find_in_vector(&"XMASXMASXMAS".chars().collect(), "XMAS"));
+
     let a = find_xmas(grid);
     let b = find_xmas(&rot_grid(grid));
 
-    // ignore first row to prevent counting diagonals in the middle of the grid double
-    let c = find_xmas(&rot_grid(&diag_grid(grid, true))[1..]);
-    let d = find_xmas(&rot_grid(&diag_grid(grid, false))[1..]);
+    let c = find_xmas(&rot_grid(&diag_grid(grid, true)));
+    let d = find_xmas(&rot_grid(&diag_grid(grid, false)));
+    dbg!(a, b, c, d);
 
-    let e = find_xmas(&rot_grid(&diag_grid(&rot_grid(grid), true)));
-    let f = find_xmas(&rot_grid(&diag_grid(&rot_grid(grid), false)));
-    dbg!(a, b, c, d, e, f);
-
-    a + b + c + d + e + f
+    a + b + c + d
 }
 
 fn printgrid(grid: &[Vec<char>]) {
@@ -50,7 +51,7 @@ fn find_in_vector(vec: &Vec<char>, pat: &str) -> u32 {
 
             // pattern match
             count += 1;
-            i += pchar.len();
+            i += pchar.len() - 1;
         }
 
         i += 1;
@@ -60,10 +61,8 @@ fn find_in_vector(vec: &Vec<char>, pat: &str) -> u32 {
 }
 
 fn find_xmas(grid: &[Vec<char>]) -> u32 {
-    println!();
     grid.iter()
         .map(|row| find_in_vector(row, "XMAS") + find_in_vector(row, "SAMX"))
-        .map(|v| { dbg!(v); v })
         .sum()
 }
 
@@ -81,16 +80,19 @@ fn rot_grid(grid: &[Vec<char>]) -> Vec<Vec<char>> {
 }
 
 fn diag_grid(grid: &[Vec<char>], left: bool) -> Vec<Vec<char>> {
-    let mut result: Vec<Vec<char>> = vec![Vec::new(); grid.len()];
+    let width = (grid[0].len() * 2) - 1; // the width of the diag. grid will be 2* the width of the original - 1 at the top/bottom
+    let height = grid.len();
+    let mut result: Vec<Vec<char>> = vec![Vec::new(); height];
 
     for y in 0..grid.len() {
         if left {
-            result[y].extend(&grid[y][y..]);
+            result[y].extend(&vec!['.'; y]); // pad left side
+            result[y].extend(&grid[y]); // add row, right side will pad at the end
         } else {
-            result[y].extend(&grid[y][grid[y].len() - y - 1..]);
+            result[y].extend(&vec!['.'; height - y - 1]);
+            result[y].extend(&grid[y]);
         }
-
-        for i in result[y].len()..grid[y].len() {
+        for i in result[y].len()..width {
             result[y].push('.');
         }
     }
