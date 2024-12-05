@@ -8,20 +8,19 @@ fn parse_input_day4(input: &str) -> Vec<Vec<char>> {
 
 #[aoc(day4, part1)]
 fn part1(grid: &[Vec<char>]) -> u32 {
-    dbg!(find_in_vector(&"MMMSXMAXXMASM".chars().collect(), "XMAS"));
-    dbg!(find_in_vector(&"MXMXMASAMXXMAM".chars().collect(), "SAMX"));
-
-    printgrid(&grid);
-    printgrid(&rot_grid(grid));
-    printgrid(&rot_grid(&diag_grid(grid, true)));
-    printgrid(&rot_grid(&diag_grid(grid, false)));
+    printgrid(grid);
     let a = find_xmas(grid);
     let b = find_xmas(&rot_grid(grid));
-    let c = find_xmas(&rot_grid(&diag_grid(grid, true)));
-    let d = find_xmas(&rot_grid(&diag_grid(grid, false)));
-    dbg!(a, b, c, d);
 
-    a + b + c + d
+    // ignore first row to prevent counting diagonals in the middle of the grid double
+    let c = find_xmas(&rot_grid(&diag_grid(grid, true))[1..]);
+    let d = find_xmas(&rot_grid(&diag_grid(grid, false))[1..]);
+
+    let e = find_xmas(&rot_grid(&diag_grid(&rot_grid(grid), true)));
+    let f = find_xmas(&rot_grid(&diag_grid(&rot_grid(grid), false)));
+    dbg!(a, b, c, d, e, f);
+
+    a + b + c + d + e + f
 }
 
 fn printgrid(grid: &[Vec<char>]) {
