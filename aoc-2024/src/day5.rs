@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 use std::iter::Iterator;
 use aoc_runner_derive::{aoc, aoc_generator};
+use rayon::prelude::*;
 
 #[derive(Debug)]
 struct Input {
@@ -67,6 +68,23 @@ fn part2(input: &Input) -> u32 {
         .filter(|v| !is_correct_order(&input.rules, v))
         .map(|v| {
             v.sort_by(|a, b| {
+                match is_correct_order(&input.rules, &vec![*a, *b]) {
+                    true => Ordering::Less,
+                    false => Ordering::Greater
+                }
+            });
+
+            v[v.len()/2]
+        }).sum()
+}
+
+#[aoc(day5, part2, rayon)]
+fn part2_rayon(input: &Input) -> u32 {
+    let mut updates = input.updates.clone();
+    updates.par_iter_mut()
+        .filter(|v| !is_correct_order(&input.rules, v))
+        .map(|v| {
+            v.par_sort_by(|a, b| {
                 match is_correct_order(&input.rules, &vec![*a, *b]) {
                     true => Ordering::Less,
                     false => Ordering::Greater

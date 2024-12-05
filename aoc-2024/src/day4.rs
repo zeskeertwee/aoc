@@ -8,20 +8,35 @@ fn parse_input_day4(input: &str) -> Vec<Vec<char>> {
 
 #[aoc(day4, part1)]
 fn part1(grid: &[Vec<char>]) -> u32 {
-    //printgrid(grid);
-    //printgrid(&rot_grid(grid));
-    //printgrid(&rot_grid(&diag_grid(grid, true)));
-    //printgrid(&rot_grid(&diag_grid(grid, false)));
-    dbg!(find_in_vector(&"XMASXMASXMAS".chars().collect(), "XMAS"));
+    find_xmas(grid)
+    + find_xmas(&rot_grid(grid))
+    + find_xmas(&rot_grid(&diag_grid(grid, true)))
+    + find_xmas(&rot_grid(&diag_grid(grid, false)))
+}
 
-    let a = find_xmas(grid);
-    let b = find_xmas(&rot_grid(grid));
+#[aoc(day4, part2)]
+fn part2(grid: &[Vec<char>]) -> u32 {
+    let mut count = 0;
 
-    let c = find_xmas(&rot_grid(&diag_grid(grid, true)));
-    let d = find_xmas(&rot_grid(&diag_grid(grid, false)));
-    dbg!(a, b, c, d);
+    // iterate over whole grid, except outer sides because center of X can never be on the outer side
+    for y in 1..grid.len() - 1 {
+        for x in 1..grid[0].len() - 1 {
+            if grid[y][x] == 'A' {
+                // can be the center of an X
+                let top_left = grid[y-1][x-1];
+                let top_right = grid[y-1][x+1];
+                let bot_left = grid[y+1][x-1];
+                let bot_right = grid[y+1][x+1];
 
-    a + b + c + d
+                if ((top_left == 'M' && bot_right == 'S') || (top_left == 'S' && bot_right == 'M'))
+                    && ((top_right == 'M' && bot_left == 'S') || (top_right == 'S' && bot_left == 'M')) {
+                    count += 1;
+                }
+            }
+        }
+    }
+
+    count
 }
 
 fn printgrid(grid: &[Vec<char>]) {
