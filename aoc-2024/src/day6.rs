@@ -29,14 +29,27 @@ fn parse_input(input: &str) -> Input {
 
 #[aoc(day6, part1)]
 fn part1(input: &Input) -> usize {
-    run_through_map(input.starting_pos, &input.map, usize::MAX).0
+    run_through_map(input.starting_pos, &input.map, usize::MAX).0.len()
 }
 
-// TODO: non-bruteforce method
-// keeping track of which corners were hit, and the direction, we can detect a loop
-// also restrict placement of walls to squares visited in original map
 #[aoc(day6, part2)]
 fn part2(input: &Input) -> usize {
+    let visited_positions = run_through_map(input.starting_pos, &input.map, usize::MAX).0;
+
+    visited_positions.into_par_iter().map(|(y,x)| {
+        let mut grid  = input.map.clone();
+        grid[y as usize][x as usize] = '#';
+
+        if run_through_map(input.starting_pos, &grid, usize::MAX).1 == usize::MAX {
+            1
+        } else {
+            0
+        }
+    }).sum()
+}
+
+#[aoc(day6, part2, naive)]
+fn part2_naive(input: &Input) -> usize {
     let upper_limit = input.map.len() * input.map[0].len(); // if we walk as many squares as the grid has, we probably hit a loop, right?
 
     (0..input.map.len()).into_par_iter().map(|y| {
@@ -58,13 +71,15 @@ fn part2(input: &Input) -> usize {
 }
 
 // returns visited squares, steps
-fn run_through_map(starting_pos: (isize, isize), map: &Vec<Vec<char>>, max_steps: usize) -> (usize, usize) {
+fn run_through_map(starting_pos: (isize, isize), map: &Vec<Vec<char>>, max_steps: usize) -> (HashSet<(isize, isize)>, usize) {
     let mut position = starting_pos;
     let mut direction = (-1, 0); // starting direction up
     let mut steps = 0;
 
     let mut visited: HashSet<(isize, isize)> = HashSet::new();
     visited.insert(position); // include starting position
+
+    let mut rot_pos: HashSet<(isize, isize, Direction)> = HashSet::new();
 
     loop {
         let next_position = (position.0 + direction.0, position.1 + direction.1);
@@ -73,10 +88,15 @@ fn run_through_map(starting_pos: (isize, isize), map: &Vec<Vec<char>>, max_steps
             //    println!("{}", l.iter().collect::<String>());
             //}
             // fall off the map
-            return (visited.len(), steps);
+            return (visited, steps);
         }
 
         if map[next_position.0 as usize][next_position.1 as usize] == '#' {
+            if !rot_pos.insert((position.0, position.1, direction)) {
+                // loop, we already were here in the same direction
+                //dbg!(steps);
+                return (visited, max_steps);
+            }
             direction = rot_direction(direction);
         } else {
             steps += 1;
@@ -85,7 +105,7 @@ fn run_through_map(starting_pos: (isize, isize), map: &Vec<Vec<char>>, max_steps
             visited.insert(position);
 
             if steps == max_steps {
-                return (visited.len(), steps);
+                return (visited, steps);
             }
         }
     }
