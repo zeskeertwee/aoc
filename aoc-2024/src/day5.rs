@@ -11,7 +11,7 @@ struct Input {
 
 #[aoc_generator(day5)]
 fn parse_day5(input: &str) -> Input {
-    let mut split: Vec<&str> = input.split("\n\n").collect();
+    let split: Vec<&str> = input.split("\n\n").collect();
 
     Input {
         rules: split[0].lines().map(|v| {

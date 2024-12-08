@@ -1,5 +1,4 @@
 use aoc_runner_derive::{aoc, aoc_generator};
-use rayon::prelude::*;
 
 #[aoc_generator(day4)]
 fn parse_input_day4(input: &str) -> Vec<Vec<char>> {
@@ -51,13 +50,6 @@ fn part2(grid: &[Vec<char>]) -> u32 {
     }
 
     count
-}
-
-fn printgrid(grid: &[Vec<char>]) {
-    println!("{}x{}", grid[0].len(), grid.len());
-    for row in grid {
-        println!("{}", row.iter().collect::<String>());
-    }
 }
 
 fn find_in_vector(vec: &Vec<char>, pat: &str) -> u32 {
@@ -121,7 +113,7 @@ fn diag_grid(grid: &[Vec<char>], left: bool) -> Vec<Vec<char>> {
             result[y].extend(&vec!['.'; height - y - 1]);
             result[y].extend(&grid[y]);
         }
-        for i in result[y].len()..width {
+        for _ in result[y].len()..width {
             result[y].push('.');
         }
     }
