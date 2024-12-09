@@ -93,18 +93,15 @@ fn part2(input: &Vec<Input>) -> u64 {
                 // try if we can find free space where we can put the file
                 for idx2 in last_idx[size as usize]..idx {
                     if let Input::Free { size: free_size } = fs[idx2] && free_size >= size {
-                        for i in size..10 {
-                            last_idx[i as usize] = idx2;
-                        }
+                        last_idx[size as usize] = idx2;
+
                         // we can put the file here
-                        // insert the file
-                        fs.insert(idx2, Input::File { size, id });
-                        // remove the original item
-                        fs.remove(idx2 + 1);
-                        // insert the free space where we removed the item
-                        fs.insert(idx, Input::Free { size });
-                        // remove the original item
-                        fs.remove(idx + 1);
+                        // insert the file and remove the original item
+                        fs.push_back(Input::File { size, id });
+                        fs.swap_remove_back(idx2);
+                        // insert the free space where we removed the item and remove the original item
+                        fs.push_back(Input::Free { size });
+                        fs.swap_remove_back(idx);
                         if free_size > size {
                             // also insert the remaining free size
                             fs.insert(idx2 + 1, Input::Free { size: free_size - size });
