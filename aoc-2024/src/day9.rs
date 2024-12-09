@@ -76,6 +76,7 @@ fn part2(input: &Vec<Input>) -> u64 {
     fs.extend(input);
     coalesce_free_space(&mut fs);
     let mut last_id = u64::MAX;
+    let mut last_idx = [0usize; 10];
 
     let mut idx = fs.len();
     while idx > 0 {
@@ -90,8 +91,11 @@ fn part2(input: &Vec<Input>) -> u64 {
                 }
                 last_id = id;
                 // try if we can find free space where we can put the file
-                for idx2 in 0..idx {
+                for idx2 in last_idx[size as usize]..idx {
                     if let Input::Free { size: free_size } = fs[idx2] && free_size >= size {
+                        for i in size..10 {
+                            last_idx[i as usize] = idx2;
+                        }
                         // we can put the file here
                         // insert the file
                         fs.insert(idx2, Input::File { size, id });
