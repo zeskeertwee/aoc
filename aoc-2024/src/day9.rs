@@ -70,40 +70,45 @@ fn part1(input: &Vec<Input>) -> u64 {
     }).sum()
 }
 
-// todo coalesce files/free space with 0 in between
 #[aoc(day9, part2)]
 fn part2(input: &Vec<Input>) -> u64 {
     let mut fs: VecDeque<Input> = VecDeque::new();
     fs.extend(input);
+    coalesce_free_space(&mut fs);
+    let mut last_id = u64::MAX;
 
-    let mut end = input.len();
-
-    let mut idx = input.len();
+    let mut idx = fs.len();
     while idx > 0 {
         idx -= 1;
-        dbg!(idx, fs[idx]);
-        print_layout(&fs);
+
         // iterate over the fs in reverse
         match fs[idx] {
             Input::File { size, id } => {
+                if id >= last_id {
+                    // only move each file once with descending ID order
+                    continue;
+                }
+                last_id = id;
                 // try if we can find free space where we can put the file
-                for idx2 in 0..end {
-                    dbg!(fs[idx2]);
+                for idx2 in 0..idx {
                     if let Input::Free { size: free_size } = fs[idx2] && free_size >= size {
                         // we can put the file here
-                        println!("Swap");
+                        // insert the file
+                        fs.insert(idx2, Input::File { size, id });
+                        // remove the original item
+                        fs.remove(idx2 + 1);
+                        // insert the free space where we removed the item
+                        fs.insert(idx, Input::Free { size });
+                        // remove the original item
+                        fs.remove(idx + 1);
                         if free_size > size {
                             // also insert the remaining free size
-                            fs.insert(idx2, Input::Free { size: free_size - size });
+                            fs.insert(idx2 + 1, Input::Free { size: free_size - size });
                             // we grew the fs length by one, so increase idx to not skip over it
                             if idx > idx2 {
                                 idx += 1;
                             }
                         }
-                        fs.insert(idx2, Input::File { size, id });
-                        fs.remove(idx2 + 2);
-                        fs.insert(idx, Input::Free { size });
-                        fs.remove(idx + 1);
                         break;
                     }
                 }
@@ -117,20 +122,6 @@ fn part2(input: &Vec<Input>) -> u64 {
         Input::File { id, .. } => *id,
         Input::Free { .. } => 0,
     }).sum()
-}
-
-fn print_layout(items: &VecDeque<Input>) {
-    for i in items {
-        let (n, c) = match i {
-            &Input::File { size, id } => (size, (id as u8 + ('0' as u8)) as char),
-            &Input::Free { size } => (size, '.')
-        };
-
-        for _ in 0..n {
-            print!("{}", c);
-        }
-    }
-    println!();
 }
 
 // turns the layout into the same layout but with 1-long items for part 1
@@ -153,4 +144,18 @@ fn compute_layout<'a, T: Iterator<Item = &'a Input>>(input: T) -> Vec<Input> {
     }
 
     s
+}
+
+// combines all free space that is adjacent
+fn coalesce_free_space(layout: &mut VecDeque<Input>) {
+    let mut i = 0;
+    while i < layout.len() - 1 {
+        if let Input::Free { size } = layout[i] && let Input::Free { size: size2 } = layout[i+1] {
+             // two adjacent free spaces, combine into one
+            layout[i] = Input::Free { size: size + size2 };
+            layout.remove(i + 1);
+        }
+
+        i += 1;
+    }
 }
