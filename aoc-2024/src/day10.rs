@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use fxhash::FxHashSet;
 use aoc_runner_derive::{aoc, aoc_generator};
 use crate::util::Vector2;
 
@@ -28,11 +28,11 @@ fn find_paths<const PART2: bool>(input: &Vec<Vec<u8>>) -> usize {
     input.iter().enumerate()
         .map(|(y, row)| row.iter().enumerate().filter(|(_, v)| **v == 0).map(move |(x, _)| Vector2::new(x as i64, y as i64)))
         .flatten()
-        .map(|pos| make_step::<PART2>(pos, input, &mut HashSet::new()))
+        .map(|pos| make_step::<PART2>(pos, input, &mut FxHashSet::default()))
         .sum()
 }
 
-fn make_step<const PART2: bool>(position: Vector2, grid: &Vec<Vec<u8>>, found: &mut HashSet<Vector2>) -> usize {
+fn make_step<const PART2: bool>(position: Vector2, grid: &Vec<Vec<u8>>, found: &mut FxHashSet<Vector2>) -> usize {
     let val = grid[position.y as usize][position.x as usize];
     if val == 9 {
         // only count if we didn't count this top yet, or do if it's part 2

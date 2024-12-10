@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use fxhash::FxHashMap;
 use aoc_runner_derive::{aoc, aoc_generator};
 
 #[aoc_generator(day1)]
@@ -24,7 +24,7 @@ fn part1(input: &(Vec<u32>, Vec<u32>)) -> u32 {
 
 #[aoc(day1, part2)]
 fn part2(input: &(Vec<u32>, Vec<u32>)) -> u32 {
-    let mut map = HashMap::new();
+    let mut map = FxHashMap::default();
     for i in input.1.iter() {
         *map.entry(i).or_insert(0) += 1;
     }

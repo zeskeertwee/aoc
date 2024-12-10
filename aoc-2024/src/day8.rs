@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use fxhash::{FxHashSet, FxHashMap};
 use aoc_runner_derive::{aoc, aoc_generator};
 use crate::util::Vector2;
 
@@ -23,7 +23,7 @@ fn find_antinodes<const PART2: bool>(grid: &Grid) -> usize {
     let width = grid[0].len() as i64;
     let height = grid.len() as i64;
 
-    let mut antennas: HashMap<char, Vec<Vector2>> = HashMap::new();
+    let mut antennas: FxHashMap<char, Vec<Vector2>> = FxHashMap::default();
 
     for (y, line) in grid.iter().enumerate() {
         for (x, c) in line.iter().enumerate() {
@@ -35,7 +35,7 @@ fn find_antinodes<const PART2: bool>(grid: &Grid) -> usize {
         }
     }
 
-    let mut antinodes: HashSet<Vector2> = HashSet::new();
+    let mut antinodes: FxHashSet<Vector2> = FxHashSet::default();
     
     for (_, v) in antennas.iter() {
         calculate_antenna_antinodes::<PART2>(&v, width, height).into_iter().for_each(|n| {

@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use fxhash::FxHashSet;
 use aoc_runner_derive::{aoc, aoc_generator};
 use rayon::prelude::*;
 use crate::util::Vector2;
@@ -68,14 +68,14 @@ fn part2_naive(input: &Input) -> usize {
     }).sum()
 }
 
-fn run_through_map_p1(starting_pos: Vector2, map: &Vec<Vec<char>>) -> HashSet<Vector2> {
+fn run_through_map_p1(starting_pos: Vector2, map: &Vec<Vec<char>>) -> FxHashSet<Vector2> {
     let map_width = map.len() as i64;
     let map_height = map[0].len() as i64;
 
     let mut position = starting_pos;
     let mut direction = Vector2::new(0, -1); // starting direction up
 
-    let mut visited: HashSet<Vector2> = HashSet::new();
+    let mut visited: FxHashSet<Vector2> = FxHashSet::default();
     visited.insert(position); // include starting position
 
     loop {
@@ -102,7 +102,7 @@ fn run_through_map_detect_loop(starting_pos: Vector2, map: &Vec<Vec<char>>) -> b
     let mut position = starting_pos;
     let mut direction = Vector2::new(0, -1); // starting direction up
 
-    let mut rot_pos: HashSet<(Vector2, Direction)> = HashSet::new();
+    let mut rot_pos: FxHashSet<(Vector2, Direction)> = FxHashSet::default();
 
     loop {
         let next_position = position + direction;
