@@ -35,7 +35,8 @@ fn part1(input: &Input) -> usize {
 
 #[aoc(day6, part2)]
 fn part2(input: &Input) -> usize {
-    let visited_positions = run_through_map_p1(input.starting_pos, &input.map);
+    let mut visited_positions = run_through_map_p1(input.starting_pos, &input.map);
+    visited_positions.remove(&input.starting_pos);
 
     visited_positions.into_par_iter().map(|pos| {
         let mut grid  = input.map.clone();
@@ -49,7 +50,9 @@ fn part2(input: &Input) -> usize {
 fn part2_naive(input: &Input) -> usize {
     (0..input.map.len()).into_par_iter().map(|y| {
         (0..input.map[0].len()).into_par_iter().map(|x| {
-            if input.map[y][x] == '#' {
+            if input.starting_pos.y as usize == y && input.starting_pos.x as usize == x {
+                0
+            } else if input.map[y][x] == '#' {
                 0
             } else {
                 let mut grid  = input.map.clone();
