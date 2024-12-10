@@ -72,7 +72,7 @@ fn part1(input: &Vec<Input>) -> u64 {
 
 #[aoc(day9, part2)]
 fn part2(input: &Vec<Input>) -> u64 {
-    let mut fs: VecDeque<Input> = VecDeque::new();
+    let mut fs: VecDeque<Input> = VecDeque::with_capacity(20_000);
     fs.extend(input);
     coalesce_free_space(&mut fs);
     let mut last_id = u64::MAX;
