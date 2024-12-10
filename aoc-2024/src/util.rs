@@ -7,7 +7,7 @@ pub struct Vector2 {
 }
 
 impl Vector2 {
-    pub fn new(x: i64, y: i64) -> Vector2 {
+    pub const fn new(x: i64, y: i64) -> Vector2 {
         Vector2 { x, y }
     }
 }
