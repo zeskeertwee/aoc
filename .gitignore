@@ -4,7 +4,4 @@ aoc-2022/target
 aoc-2024/target
 aoclib/target
 
-aoc-2020/input
-aoc-2021/input
-aoc-2022/input
-aoc-2024/input
+input/
