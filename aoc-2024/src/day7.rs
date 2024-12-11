@@ -18,10 +18,9 @@ pub fn parse_input(input: &str) -> Vec<Equation> {
     }).collect()
 }
 
-// too short for parallel iterator to speed up
 #[aoc(day7, part1)]
 fn part1(input: &[Equation]) -> u64 {
-    input.iter().map(|eq| {
+    input.par_iter().map(|eq| {
         try_operators::<false>(eq.test, eq.numbers[0], &eq.numbers[1..]) as u64 * eq.test
     }).sum()
 }

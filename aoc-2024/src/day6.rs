@@ -49,25 +49,6 @@ fn part2(input: &Input) -> usize {
     }).sum()
 }
 
-#[aoc(day6, part2, naive)]
-fn part2_naive(input: &Input) -> usize {
-    (0..input.map.len()).into_par_iter().map(|y| {
-        (0..input.map[0].len()).into_par_iter().map(|x| {
-            if input.starting_pos.y as usize == y && input.starting_pos.x as usize == x {
-                // don't drop an obstacle on the guard
-                0
-            } else if input.map[y][x] == '#' {
-                0
-            } else {
-                let mut grid  = input.map.clone();
-                grid[y][x] = '#';
-
-                run_through_map_detect_loop(input.starting_pos, &grid) as usize
-            }
-        }).sum::<usize>()
-    }).sum()
-}
-
 fn run_through_map_p1(starting_pos: Vector2<i64>, map: &Vec<Vec<char>>) -> FxHashSet<Vector2<i64>> {
     let map_width = map.len() as i64;
     let map_height = map[0].len() as i64;
