@@ -1,8 +1,8 @@
 use fxhash::FxHashSet;
 use aoc_runner_derive::{aoc, aoc_generator};
-use crate::util::Vector2;
+use aoclib::vec2::Vector2;
 
-const DIRECTIONS: [Vector2; 4] = [
+const DIRECTIONS: [Vector2<i64>; 4] = [
     Vector2::new(1, 0),
     Vector2::new(0, 1),
     Vector2::new(0, -1),
@@ -32,7 +32,7 @@ fn find_paths<const PART2: bool>(input: &Vec<Vec<u8>>) -> usize {
         .sum()
 }
 
-fn make_step<const PART2: bool>(position: Vector2, grid: &Vec<Vec<u8>>, found: &mut FxHashSet<Vector2>) -> usize {
+fn make_step<const PART2: bool>(position: Vector2<i64>, grid: &Vec<Vec<u8>>, found: &mut FxHashSet<Vector2<i64>>) -> usize {
     let val = grid[position.y as usize][position.x as usize];
     if val == 9 {
         // only count if we didn't count this top yet, or do if it's part 2

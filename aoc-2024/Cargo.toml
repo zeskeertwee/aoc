@@ -11,3 +11,6 @@ aoc-runner = "0.3.0"
 aoc-runner-derive = "0.3.0"
 rayon = "1.10.0"
 fxhash = "0.2.1"
+
+[dependencies.aoclib]
+path = "../aoclib"

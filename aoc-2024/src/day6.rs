@@ -1,13 +1,13 @@
 use fxhash::FxHashSet;
 use aoc_runner_derive::{aoc, aoc_generator};
 use rayon::prelude::*;
-use crate::util::Vector2;
+use aoclib::vec2::Vector2;
 
-type Direction = Vector2;
+type Direction = Vector2<i64>;
 struct Input {
     map: Vec<Vec<char>>,
     // y,x coord of starting position
-    starting_pos: Vector2
+    starting_pos: Vector2<i64>
 }
 
 #[aoc_generator(day6)]
@@ -68,14 +68,14 @@ fn part2_naive(input: &Input) -> usize {
     }).sum()
 }
 
-fn run_through_map_p1(starting_pos: Vector2, map: &Vec<Vec<char>>) -> FxHashSet<Vector2> {
+fn run_through_map_p1(starting_pos: Vector2<i64>, map: &Vec<Vec<char>>) -> FxHashSet<Vector2<i64>> {
     let map_width = map.len() as i64;
     let map_height = map[0].len() as i64;
 
     let mut position = starting_pos;
     let mut direction = Vector2::new(0, -1); // starting direction up
 
-    let mut visited: FxHashSet<Vector2> = FxHashSet::default();
+    let mut visited: FxHashSet<Vector2<i64>> = FxHashSet::default();
     visited.insert(position); // include starting position
 
     loop {
@@ -95,14 +95,14 @@ fn run_through_map_p1(starting_pos: Vector2, map: &Vec<Vec<char>>) -> FxHashSet<
 }
 
 // returns visited squares, hit loop
-fn run_through_map_detect_loop(starting_pos: Vector2, map: &Vec<Vec<char>>) -> bool {
+fn run_through_map_detect_loop(starting_pos: Vector2<i64>, map: &Vec<Vec<char>>) -> bool {
     let map_width = map.len() as i64;
     let map_height = map[0].len() as i64;
 
     let mut position = starting_pos;
     let mut direction = Vector2::new(0, -1); // starting direction up
 
-    let mut rot_pos: FxHashSet<(Vector2, Direction)> = FxHashSet::default();
+    let mut rot_pos: FxHashSet<(Vector2<i64>, Direction)> = FxHashSet::default();
 
     loop {
         let next_position = position + direction;

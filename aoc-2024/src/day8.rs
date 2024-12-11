@@ -1,6 +1,6 @@
 use fxhash::{FxHashSet, FxHashMap};
 use aoc_runner_derive::{aoc, aoc_generator};
-use crate::util::Vector2;
+use aoclib::vec2::Vector2;
 
 type Grid = Vec<Vec<char>>;
 
@@ -23,7 +23,7 @@ fn find_antinodes<const PART2: bool>(grid: &Grid) -> usize {
     let width = grid[0].len() as i64;
     let height = grid.len() as i64;
 
-    let mut antennas: FxHashMap<char, Vec<Vector2>> = FxHashMap::default();
+    let mut antennas: FxHashMap<char, Vec<Vector2<i64>>> = FxHashMap::default();
 
     for (y, line) in grid.iter().enumerate() {
         for (x, c) in line.iter().enumerate() {
@@ -35,7 +35,7 @@ fn find_antinodes<const PART2: bool>(grid: &Grid) -> usize {
         }
     }
 
-    let mut antinodes: FxHashSet<Vector2> = FxHashSet::default();
+    let mut antinodes: FxHashSet<Vector2<i64>> = FxHashSet::default();
     
     for (_, v) in antennas.iter() {
         calculate_antenna_antinodes::<PART2>(&v, width, height).into_iter().for_each(|n| {
@@ -46,8 +46,8 @@ fn find_antinodes<const PART2: bool>(grid: &Grid) -> usize {
     antinodes.len()
 }
 
-fn calculate_antenna_antinodes<const PART2: bool>(positions: &Vec<Vector2>, map_width: i64, map_height: i64) -> Vec<Vector2> {
-    let mut antinodes: Vec<Vector2> = Vec::new();
+fn calculate_antenna_antinodes<const PART2: bool>(positions: &Vec<Vector2<i64>>, map_width: i64, map_height: i64) -> Vec<Vector2<i64>> {
+    let mut antinodes: Vec<Vector2<i64>> = Vec::new();
 
     for (idx, a) in positions.iter().enumerate() {
         for (idx2, b) in positions.iter().enumerate() {
@@ -96,6 +96,6 @@ fn calculate_antenna_antinodes<const PART2: bool>(positions: &Vec<Vector2>, map_
     antinodes
 }
 
-fn check_bounds(n: &Vector2, map_width: i64, map_height: i64) -> bool {
+fn check_bounds(n: &Vector2<i64>, map_width: i64, map_height: i64) -> bool {
     n.x >= 0 && n.y >= 0 && n.x < map_width && n.y < map_height
 }
