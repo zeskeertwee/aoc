@@ -1,6 +1,12 @@
 use aoc_runner_derive::{aoc, aoc_generator};
 use fxhash::FxHashMap;
 
+#[derive(Copy, Clone)]
+enum Next {
+    Single(u64),
+    Double(u64, u64)
+}
+
 #[aoc_generator(day11)]
 fn parse_input(input: &str) -> Vec<u64> {
     input.split_whitespace().map(|v| v.parse::<u64>().unwrap()).collect()
@@ -26,20 +32,32 @@ fn blink(input: &[u64], times: usize) -> u64 {
     for _ in 0..times {
         let mut new_map = FxHashMap::default();
         for (k, v) in map.iter() {
-            if *k == 0 {
-                *new_map.entry(1).or_insert(0) += v;
-            } else if is_even(digits(*k)) {
-                let (a, b) = split_num(*k);
-                *new_map.entry(a).or_insert(0) += v;
-                *new_map.entry(b).or_insert(0) += v;
-            } else {
-                *new_map.entry(*k * 2024).or_insert(0) += v;
+            match next_number(*k) {
+                Next::Single(num) => *new_map.entry(num).or_insert(0) += *v,
+                Next::Double(num1, num2) => {
+                    *new_map.entry(num1).or_insert(0) += *v;
+                    *new_map.entry(num2).or_insert(0) += *v;
+                }
             }
         }
         map = new_map;
     }
 
     map.values().sum()
+}
+
+fn next_number(n: u64) -> Next {
+    if n == 0 {
+        return Next::Single(1)
+    }
+
+    let digits = digits(n);
+    if is_even(digits) {
+        let (a, b) = split_num(n, digits as u32);
+        return Next::Double(a, b);
+    }
+
+    Next::Single(n * 2024)
 }
 
 fn digits(n: u64) -> u64 {
@@ -50,8 +68,8 @@ fn is_even(n: u64) -> bool {
     n & 1 == 0
 }
 
-fn split_num(n: u64) -> (u64, u64) {
-    let factor = 10u64.pow(digits(n) as u32 / 2);
+fn split_num(n: u64, digits: u32) -> (u64, u64) {
+    let factor = 10u64.pow(digits / 2);
 
     (n / factor, n % factor)
 }
