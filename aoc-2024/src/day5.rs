@@ -26,16 +26,13 @@ fn parse_day5(input: &str) -> Input {
 
 #[aoc(day5, part1)]
 fn part1(input: &Input) -> u32 {
-    let mut count = 0;
-
-    for update in &input.updates {
-        if is_correct_order(&input.rules, update) {
-            // correct, add middle page number to count
-            count += update[update.len()/2];
+    input.updates.par_iter().map(|v| {
+        if is_correct_order(&input.rules, v) {
+            v[v.len() / 2]
+        } else {
+            0
         }
-    }
-
-    count
+    }).sum()
 }
 
 fn is_correct_order(rules: &Vec<(u32, u32)>, update: &[u32]) -> bool {
@@ -63,23 +60,6 @@ fn is_correct_order(rules: &Vec<(u32, u32)>, update: &[u32]) -> bool {
 
 #[aoc(day5, part2)]
 fn part2(input: &Input) -> u32 {
-    let mut updates = input.updates.clone();
-    updates.iter_mut()
-        .filter(|v| !is_correct_order(&input.rules, v))
-        .map(|v| {
-            v.sort_by(|a, b| {
-                match is_correct_order(&input.rules, &vec![*a, *b]) {
-                    true => Ordering::Less,
-                    false => Ordering::Greater
-                }
-            });
-
-            v[v.len()/2]
-        }).sum()
-}
-
-#[aoc(day5, part2, rayon)]
-fn part2_rayon(input: &Input) -> u32 {
     let mut updates = input.updates.clone();
     updates.par_iter_mut()
         .filter(|v| !is_correct_order(&input.rules, v))
