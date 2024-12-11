@@ -53,18 +53,18 @@ fn next_number(n: u64) -> Next {
 
     let digits = digits(n);
     if is_even(digits) {
-        let (a, b) = split_num(n, digits as u32);
+        let (a, b) = split_num(n, digits);
         return Next::Double(a, b);
     }
 
     Next::Single(n * 2024)
 }
 
-fn digits(n: u64) -> u64 {
-    n.ilog10() as u64 + 1
+fn digits(n: u64) -> u32 {
+    n.ilog10() + 1
 }
 
-fn is_even(n: u64) -> bool {
+fn is_even(n: u32) -> bool {
     n & 1 == 0
 }
 
