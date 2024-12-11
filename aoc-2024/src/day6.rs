@@ -2,12 +2,13 @@ use fxhash::FxHashSet;
 use aoc_runner_derive::{aoc, aoc_generator};
 use rayon::prelude::*;
 use aoclib::vec2::Vector2;
+use aoclib::grid::Grid;
+use aoclib::vec2::Direction;
 
-type Direction = Vector2<i64>;
 struct Input {
-    map: Vec<Vec<char>>,
+    map: Grid<char>,
     // y,x coord of starting position
-    starting_pos: Vector2<i64>
+    starting_pos: Vector2<usize>
 }
 
 #[aoc_generator(day6)]
@@ -15,15 +16,15 @@ fn parse_input(input: &str) -> Input {
     let mut starting_pos = Vector2::new(0, 0);
 
     Input {
-        map: input.lines().enumerate()
+        map: Grid::from_vec(input.lines().enumerate()
             .map(|(y, l)| {
                 if let Some(x) = l.find('^') {
-                    starting_pos = Vector2::new(x as i64, y as i64)
+                    starting_pos = Vector2::new(x, y)
                 }
 
                 l.chars().collect()
             })
-            .collect(),
+            .collect()),
         starting_pos
     }
 }
@@ -43,31 +44,28 @@ fn part2(input: &Input) -> usize {
 
     visited_positions.into_par_iter().map(|pos| {
         let mut grid  = input.map.clone();
-        grid[pos.y as usize][pos.x as usize] = '#';
+        grid[&pos] = '#';
 
         run_through_map_detect_loop(input.starting_pos, &grid) as usize
     }).sum()
 }
 
-fn run_through_map_p1(starting_pos: Vector2<i64>, map: &Vec<Vec<char>>) -> FxHashSet<Vector2<i64>> {
-    let map_width = map.len() as i64;
-    let map_height = map[0].len() as i64;
-
+fn run_through_map_p1(starting_pos: Vector2<usize>, map: &Grid<char>) -> FxHashSet<Vector2<usize>> {
     let mut position = starting_pos;
-    let mut direction = Vector2::new(0, -1); // starting direction up
+    let mut direction = Direction::Up; // starting direction up
 
-    let mut visited: FxHashSet<Vector2<i64>> = FxHashSet::default();
+    let mut visited: FxHashSet<Vector2<usize>> = FxHashSet::default();
     visited.insert(position); // include starting position
 
     loop {
-        let next_position = position + direction;
-        if next_position.x < 0 || next_position.y < 0 || next_position.x >= map_width || next_position.y >= map_height {
+        let next_position = direction + position;
+        if !map.is_inside(&next_position) {
             // fall off the map
             return visited;
         }
 
-        if map[next_position.y as usize][next_position.x as usize] == '#' {
-            direction = rot_direction(direction);
+        if map[&next_position] == '#' {
+            direction = direction.rot();
         } else {
             position = next_position;
             visited.insert(position);
@@ -76,26 +74,23 @@ fn run_through_map_p1(starting_pos: Vector2<i64>, map: &Vec<Vec<char>>) -> FxHas
 }
 
 // returns visited squares, hit loop
-fn run_through_map_detect_loop(starting_pos: Vector2<i64>, map: &Vec<Vec<char>>) -> bool {
-    let map_width = map.len() as i64;
-    let map_height = map[0].len() as i64;
-
+fn run_through_map_detect_loop(starting_pos: Vector2<usize>, map: &Grid<char>) -> bool {
     let mut position = starting_pos;
-    let mut direction = Vector2::new(0, -1); // starting direction up
+    let mut direction = Direction::Up; // starting direction up
 
-    let mut rot_pos: FxHashSet<(Vector2<i64>, Direction)> = FxHashSet::default();
+    let mut rot_pos: FxHashSet<(Vector2<usize>, Direction)> = FxHashSet::default();
 
     loop {
-        let next_position = position + direction;
-        if next_position.x < 0 || next_position.y < 0 || next_position.x >= map_width || next_position.y >= map_height {
+        let next_position = direction + position;
+        if !map.is_inside(&next_position) {
             // fall off the map
             return false;
         }
 
         let mut scan_pos = next_position;
-        while map[scan_pos.y as usize][scan_pos.x as usize] != '#' {
-            scan_pos = scan_pos + direction;
-            if scan_pos.x < 0 || scan_pos.y < 0 || scan_pos.x >= map_width || scan_pos.y >= map_height {
+        while map[&scan_pos] != '#' {
+            scan_pos = direction + scan_pos;
+            if !map.is_inside(&scan_pos) {
                 // fall off the map
                 return false;
             }
@@ -106,17 +101,7 @@ fn run_through_map_detect_loop(starting_pos: Vector2<i64>, map: &Vec<Vec<char>>)
             return true;
         }
 
-        position = scan_pos - direction;
-        direction = rot_direction(direction);
-    }
-}
-
-fn rot_direction(dir: Direction) -> Direction {
-    match (dir.x, dir.y) {
-        (0, -1) => Vector2::new(1, 0), // up -> right
-        (1, 0) => Vector2::new(0, 1), // right -> down
-        (0, 1) => Vector2::new(-1, 0), // down -> left
-        (-1, 0) => Vector2::new(0, -1), // left -> up
-        _ => panic!("Unexpected direction!")
+        position = direction.inv() + scan_pos;
+        direction = direction.rot();
     }
 }

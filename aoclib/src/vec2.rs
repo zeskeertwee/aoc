@@ -36,6 +36,50 @@ impl<T: Mul<Output = T> + Copy> Mul<T> for Vector2<T> {
     }
 }
 
+#[derive(Hash, Copy, Clone, Eq, PartialEq)]
+pub enum Direction {
+    Up,
+    Right,
+    Left,
+    Down
+}
+
+impl Direction {
+    pub fn rot(self) -> Self {
+        match self {
+            Direction::Up => Direction::Right, // up -> right
+            Direction::Right => Direction::Down, // right -> down
+            Direction::Down => Direction::Left, // down -> left
+            Direction::Left => Direction::Up, // left -> up
+        }
+    }
+
+    pub fn inv(self) -> Self {
+        match self {
+            Direction::Up => Direction::Down,
+            Direction::Right => Direction::Left,
+            Direction::Down => Direction::Up,
+            Direction::Left => Direction::Right
+        }
+    }
+}
+
+impl Add<Vector2<usize>> for Direction {
+    type Output = Vector2<usize>;
+
+    fn add(self, rhs: Vector2<usize>) -> Self::Output {
+        let mut r = rhs.clone();
+        match self {
+            Direction::Up => r.y -= 1,
+            Direction::Right => r.x += 1,
+            Direction::Down => r.y += 1,
+            Direction::Left => r.x -= 1
+        }
+
+        r
+    }
+}
+
 #[test]
 fn test_vec2_int() {
     let v1 = Vector2 { x: 1, y: 1 };

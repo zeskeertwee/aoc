@@ -1,53 +1,52 @@
 use fxhash::FxHashSet;
 use aoc_runner_derive::{aoc, aoc_generator};
-use aoclib::vec2::Vector2;
+use aoclib::grid::Grid;
+use aoclib::vec2::{Direction, Vector2};
+use rayon::prelude::*;
 
-const DIRECTIONS: [Vector2<i64>; 4] = [
-    Vector2::new(1, 0),
-    Vector2::new(0, 1),
-    Vector2::new(0, -1),
-    Vector2::new(-1, 0)
+const DIRECTIONS: [Direction; 4] = [
+    Direction::Up,
+    Direction::Right,
+    Direction::Down,
+    Direction::Left
 ];
 
 #[aoc_generator(day10)]
-fn parse_input(input: &str) -> Vec<Vec<u8>> {
-    input.lines().map(|v| v.chars().map(|v| v.to_digit(10).unwrap() as u8).collect()).collect()
+fn parse_input(input: &str) -> Grid<u8> {
+    Grid::parse(input, |c| c.to_digit(10).unwrap() as u8)
 }
 
 #[aoc(day10, part1)]
-fn part1(input: &Vec<Vec<u8>>) -> usize {
+fn part1(input: &Grid<u8>) -> usize {
     find_paths::<false>(input)
 }
 
 #[aoc(day10, part2)]
-fn part2(input: &Vec<Vec<u8>>) -> usize {
+fn part2(input: &Grid<u8>) -> usize {
     find_paths::<true>(input)
 }
 
-fn find_paths<const PART2: bool>(input: &Vec<Vec<u8>>) -> usize {
-    input.iter().enumerate()
-        .map(|(y, row)| row.iter().enumerate().filter(|(_, v)| **v == 0).map(move |(x, _)| Vector2::new(x as i64, y as i64)))
-        .flatten()
-        .map(|pos| make_step::<PART2>(pos, input, &mut FxHashSet::default()))
+fn find_paths<const PART2: bool>(input: &Grid<u8>) -> usize {
+    input.iter_squares()
+        .filter(|(v, _)| **v == 0)
+        .par_bridge()
+        .map(|(_, pos)| make_step::<PART2>(pos, input, &mut FxHashSet::default()))
         .sum()
 }
 
-fn make_step<const PART2: bool>(position: Vector2<i64>, grid: &Vec<Vec<u8>>, found: &mut FxHashSet<Vector2<i64>>) -> usize {
-    let val = grid[position.y as usize][position.x as usize];
+fn make_step<const PART2: bool>(position: Vector2<usize>, grid: &Grid<u8>, found: &mut FxHashSet<Vector2<usize>>) -> usize {
+    let val = grid[&position];
     if val == 9 {
         // only count if we didn't count this top yet, or do if it's part 2
         return (PART2 || found.insert(position)) as usize;
     }
 
-    let height = grid.len() as i64;
-    let width = grid[0].len() as i64;
-
     DIRECTIONS.iter().map(|direction| {
-        let new_pos = position + *direction;
-        if new_pos.x < 0 || new_pos.y < 0 || new_pos.x >= width || new_pos.y >= height {
+        let new_pos = *direction + position;
+        if !grid.is_inside(&new_pos) {
             0
         } else {
-            let new_val = grid[new_pos.y as usize][new_pos.x as usize];
+            let new_val = grid[&new_pos];
             if new_val == val + 1 {
                 make_step::<PART2>(new_pos, grid, found)
             } else {
