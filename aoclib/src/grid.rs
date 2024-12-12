@@ -1,5 +1,5 @@
 use std::ops::{Index, IndexMut};
-use crate::vec2::Vector2;
+use crate::vec2::{Vector2, DIRECTIONS};
 use itertools::Itertools;
 
 #[derive(Debug, Clone)]
@@ -32,6 +32,19 @@ impl<T> Grid<T> {
             let v = Vector2::new(x, y);
             (self.index_unchecked(&v), v)
         })
+    }
+
+    pub fn neighbour_squares(&self, v: &Vector2<usize>) -> Vec<Vector2<usize>> {
+        let mut neighbours = Vec::with_capacity(4);
+
+        for dir in DIRECTIONS {
+            let pos = dir + *v;
+            if self.is_inside(&pos) {
+                neighbours.push(pos);
+            }
+        }
+
+        neighbours
     }
 }
 

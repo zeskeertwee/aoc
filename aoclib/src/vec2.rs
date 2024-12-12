@@ -36,6 +36,13 @@ impl<T: Mul<Output = T> + Copy> Mul<T> for Vector2<T> {
     }
 }
 
+pub const DIRECTIONS: [Direction; 4] = [
+    Direction::Up,
+    Direction::Right,
+    Direction::Down,
+    Direction::Left
+];
+
 #[derive(Hash, Copy, Clone, Eq, PartialEq)]
 pub enum Direction {
     Up,
