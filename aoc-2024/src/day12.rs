@@ -1,6 +1,6 @@
 use aoc_runner_derive::{aoc, aoc_generator};
 use aoclib::grid::Grid;
-use aoclib::vec2::{Direction, Vector2, DIRECTIONS};
+use aoclib::vec2::{Direction, Vector2};
 use fxhash::FxHashSet;
 use rayon::prelude::*;
 
@@ -28,37 +28,34 @@ fn part2(input: &Grid<char>) -> usize {
 }
 
 fn extract_regions(grid: &Grid<char>) -> Vec<Region> {
-    let mut regions = Vec::new();
     let mut visited: FxHashSet<Vector2<usize>> = FxHashSet::default();
 
-    for (c, pos) in grid.iter_squares() {
-        let v = recursive_visit(grid, *c, pos, &mut visited);
-        if !v.is_empty() {
-            regions.push(v);
-        }
-    }
-
-    dbg!(visited.len());
+    let regions = grid.iter_squares()
+        .map(|(c, pos)| recursive_visit(grid, *c, pos, &mut visited))
+        .filter(|v| v.is_some())
+        .map(|v| v.unwrap())
+        .collect();
 
     regions
 }
 
-fn recursive_visit(grid: &Grid<char>, c: char, pos: Vector2<usize>, visited: &mut FxHashSet<Vector2<usize>>) -> Region {
-    let mut region = Vec::new();
-
-    if visited.contains(&pos) || grid[&pos] != c {
-        // already visited
-        return region;
+fn recursive_visit(grid: &Grid<char>, c: char, pos: Vector2<usize>, visited: &mut FxHashSet<Vector2<usize>>) -> Option<Region> {
+    if grid[&pos] != c || visited.contains(&pos) {
+        // already visited or not interesting
+        return None;
     }
 
+    let mut region = Vec::new();
     region.push(pos);
     visited.insert(pos.clone());
 
     for square in grid.neighbour_squares(&pos) {
-        region.extend(recursive_visit(grid, c, square, visited));
+        if let Some(r) = recursive_visit(grid, c, square, visited) {
+            region.extend(r);
+        }
     }
 
-    region
+    Some(region)
 }
 
 fn region_perimeter_length(grid: &Grid<char>, region: &Region) -> usize {

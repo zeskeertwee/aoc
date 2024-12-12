@@ -1,7 +1,10 @@
 use std::ops::{Index, IndexMut};
 use crate::vec2::{Vector2, DIRECTIONS};
 use itertools::Itertools;
+use bitvec::vec::BitVec;
 
+// TODO: change such that memory layout of grid is continous (not a list of vectors that are
+// non-continous in memory). Might provide better CPU cache utilization.
 #[derive(Debug, Clone)]
 pub struct Grid<T> {
     pub grid: Vec<Vec<T>>,
@@ -45,6 +48,26 @@ impl<T> Grid<T> {
         }
 
         neighbours
+    }
+}
+
+impl<T: Eq> Grid<T> {
+    pub fn flood_fill(&self) -> Vec<Vec<Vector2<usize>>> {
+        let mut regions = Vec::new();
+
+        // index into array as x + y * height
+        let mut visited = BitVec::repeat(false, self.width * self.height);
+
+        for (c, v) in self.iter_squares() {
+            let index = v.x + v.y * self.height;
+            if visited[index] {
+                continue;
+            }
+
+            let mut region = Vec::new();
+            let mut stack = vec![v];
+            
+        }
     }
 }
 
