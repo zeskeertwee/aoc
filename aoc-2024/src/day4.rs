@@ -1,6 +1,6 @@
 use aoc_runner_derive::{aoc, aoc_generator};
 use aoclib::grid::Grid;
-use aoclib::vec2::Vector2;
+use aoclib::vec2::{Direction, Vector2};
 
 #[aoc_generator(day4)]
 fn parse_input_day4(input: &str) -> Grid<char> {
@@ -39,10 +39,10 @@ fn part2(grid: &Grid<char>) -> u32 {
             let pos = Vector2::new(x, y);
             if *grid.index_unchecked(&pos) == 'A' {
                 // can be the center of an X
-                let top_left = grid.grid[y-1][x-1];
-                let top_right = grid.grid[y-1][x+1];
-                let bot_left = grid.grid[y+1][x-1];
-                let bot_right = grid.grid[y+1][x+1];
+                let top_left = grid[&(Direction::Up + (Direction::Left + pos))];
+                let top_right = grid[&(Direction::Up + (Direction::Right + pos))];
+                let bot_left = grid[&(Direction::Down + (Direction::Left + pos))];
+                let bot_right = grid[&(Direction::Down + (Direction::Right + pos))];
 
                 if ((top_left == 'M' && bot_right == 'S') || (top_left == 'S' && bot_right == 'M'))
                     && ((top_right == 'M' && bot_left == 'S') || (top_right == 'S' && bot_left == 'M')) {
@@ -55,7 +55,7 @@ fn part2(grid: &Grid<char>) -> u32 {
     count
 }
 
-fn find_in_vector(vec: &Vec<char>, pat: &str) -> u32 {
+fn find_in_vector(vec: &[char], pat: &str) -> u32 {
     let pchar: Vec<char> = pat.chars().collect();
     let mut count = 0;
     let mut i = 0;
@@ -85,7 +85,7 @@ fn find_in_vector(vec: &Vec<char>, pat: &str) -> u32 {
 }
 
 fn find_xmas(grid: &Grid<char>) -> u32 {
-    grid.grid.iter()
+    grid.rows()
         .map(|row| find_in_vector(row, "XMAS") + find_in_vector(row, "SAMX"))
         .sum()
 }
@@ -98,15 +98,15 @@ fn diag_grid(grid: &Grid<char>, left: bool) -> Grid<char> {
     for y in 0..grid.height {
         if left {
             result[y].extend(&vec!['.'; y]); // pad left side
-            result[y].extend(&grid.grid[y]); // add row, right side will pad at the end
+            result[y].extend(grid.get_row(y)); // add row, right side will pad at the end
         } else {
             result[y].extend(&vec!['.'; height - y - 1]);
-            result[y].extend(&grid.grid[y]);
+            result[y].extend(grid.get_row(y));
         }
         for _ in result[y].len()..width {
             result[y].push('.');
         }
     }
 
-    Grid::from_vec(result)
+    Grid::from_vec(result.into_iter().flatten().collect(), grid.height)
 }

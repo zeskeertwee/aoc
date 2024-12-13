@@ -14,6 +14,7 @@ struct Input {
 #[aoc_generator(day6)]
 fn parse_input(input: &str) -> Input {
     let mut starting_pos = Vector2::new(0, 0);
+    let height = input.lines().count();
 
     Input {
         map: Grid::from_vec(input.lines().enumerate()
@@ -22,9 +23,10 @@ fn parse_input(input: &str) -> Input {
                     starting_pos = Vector2::new(x, y)
                 }
 
-                l.chars().collect()
+                l.chars()
             })
-            .collect()),
+            .flatten()
+            .collect(), height),
         starting_pos
     }
 }
