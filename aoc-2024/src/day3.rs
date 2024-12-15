@@ -1,7 +1,8 @@
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 
 #[aoc_generator(day3)]
-fn parse_input_day3(input: &str) -> String {
+fn parse_input(input: &str) -> String {
     input.to_string()
 }
 
@@ -87,3 +88,6 @@ fn part2(input: &str) -> u64 {
     count
 
 }
+
+aoc_test!(test_day3_sample, "../samples/day3.txt", 161, 48);
+aoc_test!(test_day3, "../input/2024/day3.txt", 155955228, 100189366);

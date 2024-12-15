@@ -1,5 +1,6 @@
 use fxhash::FxHashSet;
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 use aoclib::grid::Grid;
 use aoclib::vec2::{Direction, Vector2};
 use rayon::prelude::*;
@@ -55,3 +56,6 @@ fn make_step<const PART2: bool>(position: Vector2<usize>, grid: &Grid<u8>, found
         }
     }).sum()
 }
+
+aoc_test!(test_day10_sample, "../samples/day10.txt", 36, 81);
+aoc_test!(test_day10, "../input/2024/day10.txt", 659, 1463);

@@ -1,4 +1,5 @@
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 use rayon::prelude::*;
 
 pub struct Equation {
@@ -60,3 +61,6 @@ fn try_operators<const PART2: bool>(test: u64, n0: u64, numbers: &[u64]) -> bool
 fn concat(a: u64, b: u64) -> u64 {
     a * 10u64.pow(b.ilog10() + 1) + b
 }
+
+aoc_test!(test_day7_sample, "../samples/day7.txt", 3749, 11387);
+aoc_test!(test_day7, "../input/2024/day7.txt", 1298103531759, 140575048428831);

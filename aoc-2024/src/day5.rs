@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 use std::iter::Iterator;
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 use rayon::prelude::*;
 
 #[derive(Debug)]
@@ -10,7 +11,7 @@ struct Input {
 }
 
 #[aoc_generator(day5)]
-fn parse_day5(input: &str) -> Input {
+fn parse_input(input: &str) -> Input {
     let split: Vec<&str> = input.split("\n\n").collect();
 
     Input {
@@ -74,3 +75,6 @@ fn part2(input: &Input) -> u32 {
             v[v.len()/2]
         }).sum()
 }
+
+aoc_test!(test_day5_sample, "../samples/day5.txt", 143, 123);
+aoc_test!(test_day5, "../input/2024/day5.txt", 6498, 5017);

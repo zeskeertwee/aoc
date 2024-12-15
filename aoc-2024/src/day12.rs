@@ -1,4 +1,5 @@
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 use aoclib::grid::Grid;
 use aoclib::vec2::{Direction, Vector2};
 use rayon::prelude::*;
@@ -79,3 +80,7 @@ fn region_corners(region: Region) -> usize {
 
     corners
 }
+
+aoc_test!(test_day12_sample1, "../samples/day12-1.txt", 140, 80);
+aoc_test!(test_day12_sample2, "../samples/day12-2.txt", 1930, 1206);
+aoc_test!(test_day12, "../input/2024/day12.txt", 1489582, 914966);

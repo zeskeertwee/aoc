@@ -1,8 +1,9 @@
 use fxhash::FxHashMap;
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 
 #[aoc_generator(day1)]
-fn parse_input_day1(input: &str) -> (Vec<u32>, Vec<u32>) {
+fn parse_input(input: &str) -> (Vec<u32>, Vec<u32>) {
     input.lines()
         .map(|v| { v.split_ascii_whitespace().map(|v| v.parse().unwrap()).collect() })
         .fold((Vec::new(), Vec::new()), |(mut left, mut right), i: Vec<u32>| {
@@ -31,3 +32,6 @@ fn part2(input: &(Vec<u32>, Vec<u32>)) -> u32 {
 
     input.0.iter().map(|v| map.get(v).unwrap_or(&0) * v).sum()
 }
+
+aoc_test!(test_day1_sample, "../samples/day1.txt", 11, 31);
+aoc_test!(test_day1, "../input/2024/day1.txt", 3714264, 18805872);

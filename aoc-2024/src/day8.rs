@@ -1,5 +1,6 @@
 use fxhash::{FxHashSet, FxHashMap};
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 use aoclib::vec2::Vector2;
 use aoclib::grid::Grid;
 
@@ -94,3 +95,6 @@ fn calculate_antenna_antinodes<const PART2: bool>(positions: &Vec<Vector2<usize>
 fn check_bounds(n: &Vector2<usize>, map_width: usize, map_height: usize) -> bool {
     n.x < map_width && n.y < map_height
 }
+
+aoc_test!(test_day8_sample, "../samples/day8.txt", 14, 34);
+aoc_test!(test_day8, "../input/2024/day8.txt", 259, 927);

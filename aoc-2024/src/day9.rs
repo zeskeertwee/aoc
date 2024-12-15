@@ -1,5 +1,6 @@
 use std::collections::VecDeque;
 use aoc_runner_derive::{aoc_generator, aoc};
+use aoclib::aoc_test;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum Input {
@@ -160,3 +161,6 @@ fn coalesce_free_space(layout: &mut VecDeque<Input>) {
         i += 1;
     }
 }
+
+aoc_test!(test_day9_sample, "../samples/day9.txt", 1928, 2858);
+aoc_test!(test_day9, "../input/2024/day9.txt", 6225730762521, 6250605700557);

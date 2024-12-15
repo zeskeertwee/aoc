@@ -1,4 +1,5 @@
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 use fxhash::FxHashMap;
 
 #[derive(Copy, Clone)]
@@ -73,3 +74,6 @@ fn split_num(n: u64, digits: u32) -> (u64, u64) {
 
     (n / factor, n % factor)
 }
+
+aoc_test!(test_day11_sample, "../samples/day11.txt", 55312, 65601038650482);
+aoc_test!(test_day11, "../input/2024/day11.txt", 199982, 237149922829154);

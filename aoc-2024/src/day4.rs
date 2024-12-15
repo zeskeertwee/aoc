@@ -1,9 +1,10 @@
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 use aoclib::grid::Grid;
 use aoclib::vec2::{Direction, Vector2};
 
 #[aoc_generator(day4)]
-fn parse_input_day4(input: &str) -> Grid<char> {
+fn parse_input(input: &str) -> Grid<char> {
     Grid::parse(input, |c| c)
 }
 
@@ -110,3 +111,6 @@ fn diag_grid(grid: &Grid<char>, left: bool) -> Grid<char> {
 
     Grid::from_vec(result.into_iter().flatten().collect(), grid.height)
 }
+
+aoc_test!(test_day4_sample, "../samples/day4.txt", 18, 9);
+aoc_test!(test_day4, "../input/2024/day4.txt", 2447, 1868);

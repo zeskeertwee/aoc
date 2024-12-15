@@ -1,4 +1,5 @@
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 use aoclib::mat2::Mat2;
 use aoclib::vec2::Vector2;
 
@@ -61,3 +62,6 @@ fn check_vec(v: Vector2<f64>) -> Option<Vector2<usize>> {
 
     Some(Vector2::new(v.x.round() as usize, v.y.round() as usize))
 }
+
+aoc_test!(test_day13_sample, "../samples/day13.txt", 480, 875318608908);
+aoc_test!(test_day13, "../input/2024/day13.txt", 37680, 87550094242995);

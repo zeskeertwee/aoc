@@ -1,5 +1,6 @@
 use fxhash::FxHashSet;
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 use rayon::prelude::*;
 use aoclib::vec2::Vector2;
 use aoclib::grid::Grid;
@@ -107,3 +108,6 @@ fn run_through_map_detect_loop(starting_pos: Vector2<usize>, map: &Grid<char>) -
         direction = direction.rot();
     }
 }
+
+aoc_test!(test_day6_sample, "../samples/day6.txt", 41, 6);
+aoc_test!(test_day6, "../input/2024/day6.txt", 4826, 1721);

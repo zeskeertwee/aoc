@@ -1,7 +1,8 @@
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 
 #[aoc_generator(day2)]
-fn parse_input_day2(input: &str) -> Vec<Vec<u32>> {
+fn parse_input(input: &str) -> Vec<Vec<u32>> {
     input.lines()
         .map(|l| l.split_whitespace().map(|v| v.parse().unwrap()).collect())
         .collect()
@@ -58,3 +59,6 @@ fn part2(input: &[Vec<u32>]) -> u32 {
 
     count
 }
+
+aoc_test!(test_day2_sample, "../samples/day2.txt", 2, 4);
+aoc_test!(test_day2, "../input/2024/day2.txt", 371, 426);
