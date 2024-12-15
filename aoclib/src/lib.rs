@@ -2,6 +2,8 @@ pub mod vec2;
 pub mod grid;
 pub mod mat2;
 
+pub use bitvec;
+
 #[macro_export]
 macro_rules! aoc_test {
     ($name:ident, $input:literal, $part1:literal) => {

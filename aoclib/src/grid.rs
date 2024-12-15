@@ -126,6 +126,15 @@ impl<T: Eq> Grid<T> {
     }
 }
 
+impl <T: Clone> Grid<T> {
+    pub fn fill(v: T, width: usize, height: usize) -> Grid<T> {
+        Self {
+            grid: vec![v; width * height],
+            width, height
+        }
+    }
+}
+
 impl<T: Copy + Default> Grid<T> {
     pub fn rotate(&self) -> Grid<T> {
         // the amount of rows in the new grid needs to be the width of the old grid
