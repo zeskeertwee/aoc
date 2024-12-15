@@ -22,7 +22,7 @@ fn part1(input: &Grid<char>) -> usize {
 fn part2(input: &Grid<char>) -> usize {
     input.flood_fill()
         .into_par_iter()
-        .map(|r| r.len() * region_corners(input, r))
+        .map(|r| r.len() * region_corners(r))
         .sum()
 }
 
@@ -48,7 +48,7 @@ const CORNERS: [[Direction; 2]; 4] = [
     [Direction::Right, Direction::Up] // TOP RIGHT
 ];
 
-fn region_corners(grid: &Grid<char>, region: Region) -> usize {
+fn region_corners(region: Region) -> usize {
     let mut corners = 0;
 
     for i in region.iter() {

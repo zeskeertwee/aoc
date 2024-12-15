@@ -1,7 +1,7 @@
 use std::fmt::{Debug, Display};
 use std::ops::{Index, IndexMut};
 use bitvec::order::Lsb0;
-use crate::vec2::{Vector2, DIRECTIONS, Direction};
+use crate::vec2::{Vector2, DIRECTIONS};
 use bitvec::vec::BitVec;
 
 #[derive(Clone)]
@@ -120,6 +120,10 @@ impl<T: Eq> Grid<T> {
 
         regions
     }
+
+    pub fn find_first_occurance(&self, v: &T) -> Option<Vector2<usize>> {
+        self.iter_squares().find(|(val, _)| *val == v).map(|(_, v)| v)
+    }
 }
 
 impl<T: Copy + Default> Grid<T> {
@@ -157,6 +161,9 @@ impl<T> IndexMut<&Vector2<usize>> for Grid<T> {
         &mut self.grid[idx]
     }
 }
+
+#[cfg(test)]
+use crate::vec2::Direction;
 
 #[test]
 fn test_grid() {
