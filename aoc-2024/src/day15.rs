@@ -4,7 +4,7 @@ use aoc_runner_derive::{aoc, aoc_generator};
 use aoclib::aoc_test;
 use aoclib::bitvec::order::Lsb0;
 use aoclib::grid::Grid;
-use aoclib::vec2::{Direction, Vector2};
+use aoclib::vec2::{Direction, Vector2, DIRECTIONS};
 use fxhash::{FxHashMap, FxHashSet};
 use aoclib::bitvec::vec::BitVec;
 
@@ -45,7 +45,7 @@ fn part1(input: &Input) -> usize {
 #[aoc(day15, part2)]
 fn part2(input: &Input) -> usize {
     let mut grid = Grid::fill('.', input.grid.width * 2, input.grid.height);
-    let mut position = Vector2::new(input.starting_position.x * 2, input.starting_position.y);
+    let position = Vector2::new(input.starting_position.x * 2, input.starting_position.y);
     input.grid.iter_squares().for_each(|(c, pos)| {
         let new_pos_a = Vector2::new(pos.x * 2, pos.y);
         let new_pos_b = new_pos_a + Vector2::new(1, 0);
@@ -63,12 +63,10 @@ fn part2(input: &Input) -> usize {
         }
     });
 
-    for i in input.sequence.iter() {
-        position = make_move_p2(&mut grid, position, *i);
-        dbg!(&grid);
-    }
+    let _ = input.sequence.iter().fold(position, |pos, dir| make_move_p2(&mut grid, pos, *dir));
 
-    grid.iter_squares().filter(|(c, _)| **c == 'O').map(|(_, v)| 100 * v.y + v.x).sum()
+    dbg!(&grid);
+    grid.iter_squares().filter(|(c, _)| **c == '[').map(|(_, v)| 100 * v.y + v.x).sum()
 }
 
 // checks if the movement can be made, and if so, makes it. Returns the new position
@@ -124,7 +122,7 @@ fn make_move_p2(grid: &mut Grid<char>, current_pos: Vector2<usize>, direction: D
                     return current_pos;
                 }
             } else {
-                let region = flood_fill_set(grid, new_pos);
+                let region = flood_fill_set(grid, new_pos, direction);
                 let boundary = region_boundary(&region, direction);
                 if !boundary.into_iter().all(|v| check_move(grid, direction + v, direction).is_some()) {
                     // not possible
@@ -181,7 +179,7 @@ fn region_boundary(region: &Vec<Vector2<usize>>, direction: Direction) -> Vec<Ve
 }
 
 /// flood-fills starting at a given point, matching items in a set of items
-pub fn flood_fill_set(grid: &Grid<char>, pos: Vector2<usize>) -> Vec<Vector2<usize>> {
+pub fn flood_fill_set(grid: &Grid<char>, pos: Vector2<usize>, dir: Direction) -> Vec<Vector2<usize>> {
     // index into array as x + y * height
     let mut visited: BitVec<u8, Lsb0> = BitVec::repeat(false, grid.width * grid.height);
 
@@ -194,22 +192,24 @@ pub fn flood_fill_set(grid: &Grid<char>, pos: Vector2<usize>) -> Vec<Vector2<usi
         }
         visited.set(idx, true);
         region.push(v);
-        
-        let complementary_char = match grid.grid[idx] {
-            ']' => '[',
-            '[' => ']',
+
+
+        let complementary_char_dir = match grid.grid[idx] {
+            ']' => Direction::Left,
+            '[' => Direction::Right,
             _ => panic!()
         };
-        
-        for n in grid.neighbour_squares(&v) {
-            let idx = grid.calculate_index(&n);
-            let cn = grid.grid[idx];
-            
-            // if it's left or right, only flood if the region is part of the same box
-            let is_sideways = v.y == n.y;
-            if ((is_sideways && cn == complementary_char) || (!is_sideways && (cn == '[' || cn == ']'))) && !visited[idx] {
-                stack.push(n);
-            }
+        stack.push(complementary_char_dir + v);
+
+
+        let n = dir + v;
+
+        let idx = grid.calculate_index(&n);
+        let cn = grid.grid[idx];
+
+        // if it's left or right, only flood if the region is part of the same box
+        if (cn == '[' || cn == ']') && !visited[idx] {
+            stack.push(n);
         }
     }
 
