@@ -1,9 +1,11 @@
-use std::collections::VecDeque;
+use std::cmp::Ordering;
+use std::cmp::Reverse;
+use std::collections::BinaryHeap;
 use aoc_runner_derive::{aoc, aoc_generator};
 use aoclib::aoc_test;
 use aoclib::grid::Grid;
 use aoclib::vec2::{Direction, Vector2, DIRECTIONS};
-use fxhash::FxHashSet;
+use fxhash::{FxHashMap, FxHashSet};
 
 struct Input {
     grid: Grid<char>,
@@ -11,12 +13,31 @@ struct Input {
     target_pos: Vector2<usize>
 }
 
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+struct Reindeer {
+    position: Vector2<usize>,
+    direction: Direction,
+    path: Vec<Vector2<usize>>,
+    cost: usize
+}
+
+impl Ord for Reindeer {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.cost.cmp(&other.cost)
+    }
+}
+
+impl PartialOrd for Reindeer {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 #[aoc_generator(day16)]
 fn parse_input(input: &str) -> Input {
     let mut grid = Grid::parse(input, |c| c);
     let starting_pos = grid.find_first_occurance(&'S').unwrap();
     let target_pos = grid.find_first_occurance(&'E').unwrap();
-    grid[&starting_pos] = '.';
 
     Input {
         grid, starting_pos, target_pos
@@ -25,100 +46,86 @@ fn parse_input(input: &str) -> Input {
 
 #[aoc(day16, part1)]
 fn part1(input: &Input) -> usize {
-    let mut grid = input.grid.clone();
-    let mut queue: Vec<(Vector2<usize>, usize, Direction)> = Vec::new();
-    let mut visited: FxHashSet<Vector2<usize>> = FxHashSet::default();
-    queue.push((input.starting_pos, 0, Direction::Right));
-
-    while !queue.is_empty() {
-        queue.sort_by_key(|v| v.1);
-        assert!(queue.is_sorted_by_key(|v| v.1));
-        let (v, cost, prev_dir) = queue.swap_remove(0);
-        visited.insert(v);
-        grid[&v] = 'O';
-        //dbg!(&grid);
-
-        for dir in DIRECTIONS {
-            if dir.inv() == prev_dir {
-                // don't walk back
-                continue;
-            }
-
-            let rotate = dir != prev_dir;
-            let new_cost = cost + if !rotate { 1 } else { 1001 };
-            let i = dir + v;
-
-            if input.grid[&i] == '.' && !visited.contains(&i) {
-                // we can make the step
-                queue.push((i, new_cost, dir));
-            }
-
-            if input.grid[&i] == 'E' {
-                return new_cost;
-            }
-        }
-    }
-
-    0
+    bfs_maze2(&input.grid, input.starting_pos, Direction::Right,input.target_pos, false)[0].cost
 }
 
 #[aoc(day16, part2)]
 fn part2(input: &Input) -> usize {
-    let mut visited = FxHashSet::default();
-    visited.insert(input.starting_pos);
-    let sets = walk_maze(&input.grid, 0, input.starting_pos, Direction::Right, visited);
-    //dbg!(&sets);
-    let minimum_cost = sets.iter().min_by_key(|(_, cost)| cost).unwrap().1;
-    sets.into_iter().filter(|(_, cost)| *cost == minimum_cost).fold(FxHashSet::default(), |mut acc: FxHashSet<Vector2<usize>>, v| {
-        acc.extend(v.0.iter());
-        {
-            let mut grid = input.grid.clone();
-            for i in v.0.iter() {
-                grid[i] = 'O';
-            }
-            dbg!(grid);
+    let paths = bfs_maze2(&input.grid, input.starting_pos, Direction::Right, input.target_pos, true);
+    let min_cost = paths[0].cost; // assume first path is shortest
+
+    paths.iter().filter(|p| p.cost == min_cost).fold(FxHashSet::default(), |mut acc, p| {
+        for i in &p.path {
+            acc.insert(i);
         }
         acc
     }).len()
 }
 
-fn walk_maze(grid: &Grid<char>, cost: usize, position: Vector2<usize>, looking_dir: Direction, mut visited: FxHashSet<Vector2<usize>>) -> Vec<(FxHashSet<Vector2<usize>>, usize)> {
-    if cost > 110000 {
-        return vec![];
-    }
+fn bfs_maze2(grid: &Grid<char>, starting_pos: Vector2<usize>, starting_dir: Direction, target_pos: Vector2<usize>, find_multiple: bool) -> Vec<Reindeer> {
+    let mut result = Vec::new();
+    let mut shortest_len = None;
+    let mut queue: BinaryHeap<Reverse<Reindeer>> = BinaryHeap::new();
+    // stores cost to reach the node
+    let mut visited: FxHashMap<(Vector2<usize>, Direction), usize> = FxHashMap::default();
+    queue.push(Reverse(Reindeer {
+        position: starting_pos,
+        direction: starting_dir,
+        path: vec![starting_pos],
+        cost: 0
+    }));
 
-    let mut vec = Vec::new();
-    //if visited.len() % 1000 == 0 {
-    //    dbg!(visited.len());
-    //}
+    while !queue.is_empty() {
+        let reindeer = queue.pop().unwrap().0;
+        if reindeer.position == target_pos {
+            if reindeer.cost < shortest_len.unwrap_or(usize::MAX) {
+                shortest_len = Some(reindeer.cost);
+            }
 
-    for dir in DIRECTIONS {
-        if dir.inv() == looking_dir {
-            // don't walk back
+            result.push(reindeer);
+
+            if !find_multiple {
+                 return result;
+            }
             continue;
         }
 
-        let rotate = dir != looking_dir;
-        let new_cost = cost + if !rotate { 1 } else { 1001 };
-        let i = dir + position;
-
-        if grid[&i] == '.' && !visited.contains(&i) {
-            // we can make the step
-            let mut vis = visited.clone();
-            vis.insert(i);
-            let set = walk_maze(grid, new_cost, i, dir, vis);
-            vec.extend(set);
+        if let Some(c) = visited.get(&(reindeer.position, reindeer.direction)) {
+            if c < &reindeer.cost || reindeer.cost > shortest_len.unwrap_or(usize::MAX) {
+                // stop with this reindeer, we have already found a shorter path
+                continue;
+            }
         }
 
-        if grid[&i] == 'E' {
-            visited.insert(i);
-            return vec![(visited, new_cost)];
+        visited.insert((reindeer.position, reindeer.direction), reindeer.cost);
+
+        for dir in DIRECTIONS {
+            if dir.inv() == reindeer.direction {
+                // don't walk back
+                continue;
+            }
+
+            let rotate = dir != reindeer.direction;
+            let new_cost = reindeer.cost + if !rotate { 1 } else { 1001 };
+            let i = dir + reindeer.position;
+
+            if grid[&i] != '#' && !visited.contains_key(&(i, dir)) {
+                // we can make the step
+                let mut path = reindeer.path.clone();
+                path.push(i);
+                queue.push(Reverse(Reindeer {
+                    direction: dir,
+                    position: i,
+                    cost: new_cost,
+                    path
+                }));
+            }
         }
     }
 
-    vec
+    result
 }
 
 aoc_test!(test_day16_sample1, "../samples/day16-1.txt", 7036, 45);
 aoc_test!(test_day16_sample2, "../samples/day16-2.txt", 11048, 64);
-aoc_test!(test_day16, "../input/2024/day16.txt", 109516);
+aoc_test!(test_day16, "../input/2024/day16.txt", 109516, 568);
