@@ -2,15 +2,8 @@ use fxhash::FxHashSet;
 use aoc_runner_derive::{aoc, aoc_generator};
 use aoclib::aoc_test;
 use aoclib::grid::Grid;
-use aoclib::vec2::{Direction, Vector2};
+use aoclib::vec2::{DIRECTIONS, Vector2};
 use rayon::prelude::*;
-
-const DIRECTIONS: [Direction; 4] = [
-    Direction::Up,
-    Direction::Right,
-    Direction::Down,
-    Direction::Left
-];
 
 #[aoc_generator(day10)]
 fn parse_input(input: &str) -> Grid<u8> {
