@@ -35,7 +35,7 @@ impl PartialOrd for Reindeer {
 
 #[aoc_generator(day16)]
 fn parse_input(input: &str) -> Input {
-    let mut grid = Grid::parse(input, |c| c);
+    let grid = Grid::parse(input, |c| c);
     let starting_pos = grid.find_first_occurance(&'S').unwrap();
     let target_pos = grid.find_first_occurance(&'E').unwrap();
 

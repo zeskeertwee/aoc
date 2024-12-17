@@ -1,11 +1,11 @@
 use std::clone::Clone;
-use std::collections::{HashMap, VecDeque};
+use std::collections::VecDeque;
 use aoc_runner_derive::{aoc, aoc_generator};
 use aoclib::aoc_test;
 use aoclib::bitvec::order::Lsb0;
 use aoclib::grid::Grid;
-use aoclib::vec2::{Direction, Vector2, DIRECTIONS};
-use fxhash::{FxHashMap, FxHashSet};
+use aoclib::vec2::{Direction, Vector2};
+use fxhash::FxHashMap;
 use aoclib::bitvec::vec::BitVec;
 
 struct Input {
@@ -113,8 +113,8 @@ fn make_move_p2(grid: &mut Grid<char>, current_pos: Vector2<usize>, direction: D
             let elements = if direction == Direction::Right || direction == Direction::Left {
                 if let Some(free_space) = check_move(grid, new_pos, direction) {
                     match direction {
-                        Direction::Right => (new_pos.x..free_space.x),
-                        Direction::Left => (free_space.x + 1..current_pos.x),
+                        Direction::Right => new_pos.x..free_space.x,
+                        Direction::Left => free_space.x + 1..current_pos.x,
                         _ => panic!()
                     }.into_iter().map(|x| Vector2::new(x, current_pos.y)).collect()
                 } else {
