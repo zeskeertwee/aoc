@@ -1,6 +1,8 @@
+use std::borrow::ToOwned;
 use aoc_runner_derive::{aoc, aoc_generator};
 use aoclib::aoc_test;
 use aoclib::vec2::Vector2;
+use rayon::prelude::*;
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 struct Robot {
@@ -49,8 +51,10 @@ fn part2(input: &[Robot]) -> usize {
     // assuming the christmas tree is centered, the safety factor should be the lowest
     // TODO: checking for clustered robots on the x and y axis and then finding the LCM of those times should be much faster
     (1..10000usize)
+        .par_bridge()
         .map(|t| {
-            step_robots(&mut robots, 1, &size);
+            let mut robots = input.to_owned();
+            step_robots(&mut robots, t as i32, &size);
             (safety_factor(&robots, &size), t)
         })
         .min_by_key(|(s, _)| *s)
