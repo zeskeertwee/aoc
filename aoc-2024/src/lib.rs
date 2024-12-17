@@ -1,4 +1,6 @@
 #![feature(let_chains)]
+#![feature(array_chunks)]
+
 use aoc_runner_derive::aoc_lib;
 
 // TODO: allow result passing from part 1 to 2
@@ -19,5 +21,6 @@ mod day13;
 mod day14;
 mod day15;
 mod day16;
+mod day17;
 
 aoc_lib! { year = 2024 }
