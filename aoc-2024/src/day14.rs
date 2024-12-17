@@ -41,7 +41,6 @@ fn part1(input: &[Robot]) -> usize {
 
 #[aoc(day14, part2)]
 fn part2(input: &[Robot]) -> usize {
-    let mut robots = input.to_owned();
     let size = if input.len() < 20 {
         Vector2::new(11, 7)
     } else {
