@@ -10,6 +10,9 @@ authors = ["Jasper Fortuin <zeskeertwee@gmail.com>"]
 # some solutions rely on underflows of usize Vector2's, so they break with this on
 overflow-checks = false
 
+[profile.dev]
+overflow-checks = false
+
 [dependencies]
 aoc-runner = "0.3.0"
 aoc-runner-derive = "0.3.0"
