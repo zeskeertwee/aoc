@@ -43,7 +43,7 @@ pub const DIRECTIONS: [Direction; 4] = [
     Direction::Left
 ];
 
-#[derive(Hash, Copy, Clone, Eq, PartialEq, Debug)]
+#[derive(Hash, Copy, Clone, Eq, PartialEq, Debug, Ord, PartialOrd)]
 pub enum Direction {
     Up,
     Right,

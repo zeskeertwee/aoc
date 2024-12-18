@@ -87,22 +87,24 @@ impl<T> Grid<T> {
     }
 }
 
+// cost and priority are seperate as they might not be the same
 #[derive(PartialEq, Eq, Debug)]
 struct Node {
     position: Vector2<usize>,
     cost: usize,
+    priority: usize,
 }
 
 // both PartialOrd and Ord implementations are reversed since we want the BinaryHeap to pop the *lowest* cost element
 impl PartialOrd for Node {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        other.cost.partial_cmp(&self.cost)
+        other.priority.partial_cmp(&self.priority)
     }
 }
 
 impl Ord for Node {
     fn cmp(&self, other: &Self) -> Ordering {
-        other.cost.cmp(&self.cost)
+        other.priority.cmp(&self.priority)
     }
 }
 
@@ -147,6 +149,7 @@ impl<T: Eq> Grid<T> {
         let mut queue: BinaryHeap<Node> = BinaryHeap::new();
         queue.push(Node {
             position: start,
+            priority: 0,
             cost: 0
         });
 
@@ -160,16 +163,52 @@ impl<T: Eq> Grid<T> {
 
             for neighbor in self.neighbour_squares(&node.position) {
                 let idx = self.calculate_index(&neighbor);
-                if &self.grid[idx] == allowed_item && !visited[idx] && self.is_inside(&neighbor) {
+                if &self.grid[idx] == allowed_item && !visited[idx]  {
                     visited.set(idx, true);
                     queue.push(Node {
                         position: neighbor,
+                        priority: node.cost + 1,
                         cost: node.cost + 1,
                     })
                 }
             }
         }
 
+        None
+    }
+    
+    pub fn astar_find_path(&self, start: Vector2<usize>, target: Vector2<usize>, allowed_item: &T) -> Option<usize> {
+        let mut queue = BinaryHeap::new();
+        let heuristic = |v: &Vector2<usize>| { v.x.abs_diff(target.x) + v.y.abs_diff(target.y) };
+        
+        queue.push(Node {
+            priority: heuristic(&start),
+            position: start,
+            cost: 0,
+        });
+        
+        let mut visited: BitVec<u8, Lsb0> = BitVec::repeat(false, self.grid.len());
+        
+        while !queue.is_empty() {
+            let node = queue.pop().unwrap();
+            if node.position == target {
+                return Some(node.cost);
+            }
+            
+            for neighbor in self.neighbour_squares(&node.position) {
+                let idx = self.calculate_index(&neighbor);
+                if &self.grid[idx] == allowed_item && !visited[idx] {
+                    visited.set(idx, true);
+                    let new_cost = node.cost + 1;
+                    queue.push(Node {
+                        priority: new_cost + heuristic(&neighbor),
+                        position: neighbor,
+                        cost: new_cost
+                    })
+                }
+            }
+        }
+        
         None
     }
 
