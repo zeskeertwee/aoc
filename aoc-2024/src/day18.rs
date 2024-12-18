@@ -31,8 +31,13 @@ fn part2(input: &[Vector2<usize>]) -> String {
     // binary search to find the index at which there is no path anymore (starting from 1024)
     let mut step_size: i64 = (input.len() as i64 - if input.len() > 30 { 1024 } else { 12 }) / 2;
     let mut current_value = if input.len() > 30 { 1024 } else { 12 } + step_size;
+    let mut final_value = 0;
 
     loop {
+        if step_size.abs() == 0 {
+            break;
+        }
+
         let mut grid = if input.len() > 30 {
             Grid::fill('.', 71, 71)
         } else {
@@ -43,21 +48,21 @@ fn part2(input: &[Vector2<usize>]) -> String {
 
         match grid.bfs_find_path(Vector2::new(0, 0), Vector2::new(grid.width - 1, grid.height - 1), &'.') {
             None => {
+                final_value = current_value - 1;
                 step_size = -1 * step_size.abs() / 2;
             },
             _ => {
-                if step_size.abs() <= 1 {
-                    let pos = input[current_value as usize];
-                    return format!("{},{}", pos.x, pos.y);
-                }
-
+                final_value = current_value;
                 step_size = step_size.abs() / 2;
             }
         }
 
         current_value += step_size;
     }
+
+    let pos = input[final_value as usize];
+    format!("{},{}", pos.x, pos.y)
 }
 
 aoc_test!(test_day18_sample, "../samples/day18.txt", 22, "6,1");
-aoc_test!(test_day18, "../input/2024/day18.txt", 312, "28.26");
+aoc_test!(test_day18, "../input/2024/day18.txt", 312, "28,26");
