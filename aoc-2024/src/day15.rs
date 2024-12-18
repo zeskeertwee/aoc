@@ -2,11 +2,9 @@ use std::clone::Clone;
 use std::collections::VecDeque;
 use aoc_runner_derive::{aoc, aoc_generator};
 use aoclib::aoc_test;
-use aoclib::bitvec::order::Lsb0;
 use aoclib::grid::Grid;
 use aoclib::vec2::{Direction, Vector2};
-use fxhash::FxHashMap;
-use aoclib::bitvec::vec::BitVec;
+use fxhash::FxHashSet;
 
 struct Input {
     grid: Grid<char>,
@@ -65,7 +63,6 @@ fn part2(input: &Input) -> usize {
 
     let _ = input.sequence.iter().fold(position, |pos, dir| make_move_p2(&mut grid, pos, *dir));
 
-    dbg!(&grid);
     grid.iter_squares().filter(|(c, _)| **c == '[').map(|(_, v)| 100 * v.y + v.x).sum()
 }
 
@@ -101,6 +98,29 @@ fn check_move(grid: &Grid<char>, position: Vector2<usize>, direction: Direction)
     }
 }
 
+fn check_move2(grid: &Grid<char>, pos: Vector2<usize>, direction: Direction, checked_boxes: &mut FxHashSet<Vector2<usize>>) -> bool {
+    // take the left of the box as the 'primary' position
+    let box_pos = match grid[&pos] {
+        '[' => pos,
+        ']' => Direction::Left + pos,
+        '#' => return false,
+        '.' => return true,
+        _ => panic!()
+    };
+
+    if checked_boxes.contains(&box_pos) {
+        return true;
+    }
+
+    let box_pos_right = Direction::Right + box_pos;
+    if check_move2(grid, direction + box_pos, direction, checked_boxes) && check_move2(grid, direction + box_pos_right, direction, checked_boxes) {
+        checked_boxes.insert(box_pos);
+        return true;
+    }
+
+    false
+}
+
 // checks if the move can be made and makes it, if possible
 fn make_move_p2(grid: &mut Grid<char>, current_pos: Vector2<usize>, direction: Direction) -> Vector2<usize> {
     let new_pos = direction + current_pos;
@@ -110,7 +130,7 @@ fn make_move_p2(grid: &mut Grid<char>, current_pos: Vector2<usize>, direction: D
         '#' => current_pos,
         '.' => new_pos,
         '[' | ']' => {
-            let elements = if direction == Direction::Right || direction == Direction::Left {
+            let elements: Vec<Vector2<usize>> = if direction == Direction::Right || direction == Direction::Left {
                 if let Some(free_space) = check_move(grid, new_pos, direction) {
                     match direction {
                         Direction::Right => new_pos.x..free_space.x,
@@ -122,14 +142,17 @@ fn make_move_p2(grid: &mut Grid<char>, current_pos: Vector2<usize>, direction: D
                     return current_pos;
                 }
             } else {
-                let region = flood_fill_set(grid, new_pos, direction);
-                let boundary = region_boundary(&region, direction);
-                if !boundary.into_iter().all(|v| check_move(grid, direction + v, direction).is_some()) {
-                    // not possible
+                let mut set = FxHashSet::default();
+                if !check_move2(grid, new_pos, direction, &mut set) {
+                    // can't move
                     return current_pos;
                 }
-                
-                region
+                let mut elements = Vec::with_capacity(set.len() * 2);
+                set.into_iter().for_each(|v| {
+                    elements.push(Direction::Right + v);
+                    elements.push(v);
+                });
+                elements
             };
             
             let mut val = VecDeque::with_capacity(elements.len());
@@ -149,72 +172,5 @@ fn make_move_p2(grid: &mut Grid<char>, current_pos: Vector2<usize>, direction: D
     }
 }
 
-// returns all elements forming the front boundary when looking in the direction
-fn region_boundary(region: &Vec<Vector2<usize>>, direction: Direction) -> Vec<Vector2<usize>> {
-    // x, lowest/highest y depending on direction
-    let mut map: FxHashMap<usize, usize> = FxHashMap::default();
-    let up = match direction {
-        Direction::Down => false,
-        Direction::Up => true,
-        _ => panic!()
-    };
-
-    for v in region {
-        match map.get(&v.x) {
-            Some(y) => {
-                // increasing y coordinate means going down in the coordinate system, as 0,0 is in the top left
-                if up && v.y < *y {
-                    map.insert(v.x, v.y);
-                } else if v.y > *y {
-                    map.insert(v.x, v.y);
-                }
-            },
-            None => {
-                map.insert(v.x, v.y);
-            },
-        }
-    }
-
-    map.into_iter().map(|(x, y)| Vector2::new(x, y)).collect()
-}
-
-/// flood-fills starting at a given point, matching items in a set of items
-pub fn flood_fill_set(grid: &Grid<char>, pos: Vector2<usize>, dir: Direction) -> Vec<Vector2<usize>> {
-    // index into array as x + y * height
-    let mut visited: BitVec<u8, Lsb0> = BitVec::repeat(false, grid.width * grid.height);
-
-    let mut region = Vec::new();
-    let mut stack = vec![pos];
-    while let Some(v) = stack.pop() {
-        let idx = grid.calculate_index(&v);
-        if visited[idx] {
-            continue;
-        }
-        visited.set(idx, true);
-        region.push(v);
-
-
-        let complementary_char_dir = match grid.grid[idx] {
-            ']' => Direction::Left,
-            '[' => Direction::Right,
-            _ => panic!()
-        };
-        stack.push(complementary_char_dir + v);
-
-
-        let n = dir + v;
-
-        let idx = grid.calculate_index(&n);
-        let cn = grid.grid[idx];
-
-        // if it's left or right, only flood if the region is part of the same box
-        if (cn == '[' || cn == ']') && !visited[idx] {
-            stack.push(n);
-        }
-    }
-
-    region
-}
-
 aoc_test!(test_day15_sample, "../samples/day15.txt", 10092, 9021);
-aoc_test!(test_day15, "../input/2024/day15.txt", 1490942);
+aoc_test!(test_day15, "../input/2024/day15.txt", 1490942, 1519202);

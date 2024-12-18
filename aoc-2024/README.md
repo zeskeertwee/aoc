@@ -1,4 +1,5 @@
 ## Advent of Code 2024
+The goal is to solve all AoC 2024 exersises (both parts) in <1000ms. Preferably <500ms.
 
 | Day | Part 1   | Part 2   | Libraries              |
 |-----|----------|----------|------------------------|
@@ -16,7 +17,7 @@
 | 12  | 2.157ms  | 3.025ms  | FxHash, Rayon          |
 | 13  | 6.890μs  | 52.64μs  |                        |
 | 14  | 4.807μs  | 6.700ms  | Rayon (part 2)         |
-| 15  | 230.3μs  |          | FxHash                 |
+| 15  | 226.5μs  | 459.0μs  | FxHash                 |
 | 16  | 39.59ms* | 38.76ms* | FxHash                 |
 | 17  | 509.4ns  | 58.28μs  |                        |
 | 18  | 229.7μs  | 392.2μs  |                        |
