@@ -68,6 +68,7 @@ fn bfs_maze2(grid: &Grid<char>, starting_pos: Vector2<usize>, starting_dir: Dire
     let mut queue: BinaryHeap<Reverse<Reindeer>> = BinaryHeap::new();
     // stores cost to reach the node
     let mut visited: FxHashMap<(Vector2<usize>, Direction), usize> = FxHashMap::default();
+
     queue.push(Reverse(Reindeer {
         position: starting_pos,
         direction: starting_dir,
@@ -105,8 +106,8 @@ fn bfs_maze2(grid: &Grid<char>, starting_pos: Vector2<usize>, starting_dir: Dire
                 continue;
             }
 
-            let rotate = dir != reindeer.direction;
-            let new_cost = reindeer.cost + if !rotate { 1 } else { 1001 };
+            let rotate = (dir != reindeer.direction) as usize;
+            let new_cost = reindeer.cost + 1 + rotate * 1000;
             let i = dir + reindeer.position;
 
             if grid[&i] != '#' && !visited.contains_key(&(i, dir)) {
