@@ -1,3 +1,5 @@
+use std::cmp::{Ordering, Reverse};
+use std::collections::BinaryHeap;
 use std::fmt::{Debug, Display};
 use std::ops::{Index, IndexMut};
 use bitvec::order::Lsb0;
@@ -85,6 +87,25 @@ impl<T> Grid<T> {
     }
 }
 
+#[derive(PartialEq, Eq, Debug)]
+struct Node {
+    position: Vector2<usize>,
+    cost: usize,
+}
+
+// both PartialOrd and Ord implementations are reversed since we want the BinaryHeap to pop the *lowest* cost element
+impl PartialOrd for Node {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        other.cost.partial_cmp(&self.cost)
+    }
+}
+
+impl Ord for Node {
+    fn cmp(&self, other: &Self) -> Ordering {
+        other.cost.cmp(&self.cost)
+    }
+}
+
 impl<T: Eq> Grid<T> {
     pub fn flood_fill(&self) -> Vec<Vec<Vector2<usize>>> {
         let mut regions = Vec::new();
@@ -119,6 +140,37 @@ impl<T: Eq> Grid<T> {
         }
 
         regions
+    }
+    
+    /// Searches breadth-first to find the shortest path from start to target, only walking over allowed_item, and returns the amount of steps in the path, if found.
+    pub fn bfs_find_path(&self, start: Vector2<usize>, target: Vector2<usize>, allowed_item: &T) -> Option<usize> {
+        let mut queue: BinaryHeap<Node> = BinaryHeap::new();
+        queue.push(Node {
+            position: start,
+            cost: 0
+        });
+
+        let mut visited: BitVec<u8, Lsb0> = BitVec::repeat(false, self.grid.len());
+
+        while !queue.is_empty() {
+            let node = queue.pop().unwrap();
+            if node.position == target {
+                return Some(node.cost);
+            }
+
+            for neighbor in self.neighbour_squares(&node.position) {
+                let idx = self.calculate_index(&neighbor);
+                if &self.grid[idx] == allowed_item && !visited[idx] && self.is_inside(&neighbor) {
+                    visited.set(idx, true);
+                    queue.push(Node {
+                        position: neighbor,
+                        cost: node.cost + 1,
+                    })
+                }
+            }
+        }
+
+        None
     }
 
     pub fn find_first_occurance(&self, v: &T) -> Option<Vector2<usize>> {
