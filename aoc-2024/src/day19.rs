@@ -40,21 +40,6 @@ fn part2(input: &Input) -> usize {
     input.designs.par_iter().map(|d| possible_combinations::<true>(&d, &input.patterns, input.longest_pattern, &mut FxHashMap::default())).sum()
 }
 
-fn check_design(design: &str, patterns: &FxHashSet<String>, longest_pattern: usize) -> bool {
-    if design.len() == 0 {
-        return true;
-    }
-
-    for i in 1..min(longest_pattern, design.len()) + 1 {
-        let pat = &design[..i];
-        if patterns.contains(pat) && check_design(&design[i..], patterns, longest_pattern) {
-            return true
-        }
-    }
-
-    false
-}
-
 fn possible_combinations<const PART2: bool>(design: &str, patterns: &FxHashSet<String>, longest_pattern: usize, cache: &mut FxHashMap<String, usize>) -> usize {
     if design.len() == 0 {
         return 1;
