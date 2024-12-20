@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use std::ops::{Add, Sub, Mul};
 
 #[derive(Debug, Copy, Clone, PartialEq, Hash, Eq, PartialOrd, Ord)]
@@ -33,6 +34,12 @@ impl<T: Mul<Output = T> + Copy> Mul<T> for Vector2<T> {
 
     fn mul(self, rhs: T) -> Vector2<T> {
         Vector2 { x: self.x * rhs, y: self.y * rhs }
+    }
+}
+
+impl<T: Display> Display for Vector2<T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Vector2({},{})", self.x, self.y)
     }
 }
 

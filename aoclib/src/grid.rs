@@ -78,6 +78,42 @@ impl<T> Grid<T> {
         neighbours
     }
 
+    // returns a list off all the neighbour squares that are radius steps away.
+    pub fn neighbour_squares_radius(&self, v: &Vector2<usize>, radius: usize) -> Vec<Vector2<usize>> {
+        let mut neighbours = Vec::new();
+
+        for x in 0..=radius {
+            let dy = radius - x;
+            let v1 = Vector2::new(v.x - x, v.y - dy);
+            if self.is_inside(&v1) {
+                neighbours.push(v1);
+            }
+
+            if x != radius {
+                let v2 = Vector2::new(v.x - x, v.y + dy);
+                if self.is_inside(&v2) {
+                    neighbours.push(v2);
+                }
+            }
+
+            if x != 0 {
+                let v3 = Vector2::new(v.x + x, v.y - dy);
+                if self.is_inside(&v3) {
+                    neighbours.push(v3);
+                }
+
+                if x != radius {
+                    let v4 = Vector2::new(v.x + x, v.y + dy);
+                    if self.is_inside(&v4) {
+                        neighbours.push(v4);
+                    }
+                }
+            }
+        }
+
+        neighbours
+    }
+
     pub fn get_row(&self, row: usize) -> &[T] {
         &self.grid[(self.width * row)..(self.width * (row + 1))]
     }
@@ -165,6 +201,44 @@ impl<T: Eq> Grid<T> {
                 let idx = self.calculate_index(&neighbor);
                 if &self.grid[idx] == allowed_item && !visited[idx]  {
                     visited.set(idx, true);
+                    queue.push(Node {
+                        position: neighbor,
+                        priority: node.cost + 1,
+                        cost: node.cost + 1,
+                    })
+                }
+            }
+        }
+
+        None
+    }
+
+    /// Searches breadth-first for the cheapest path to each node, stopping when the target is reached
+    pub fn bfs_find_node_costs(&self, start: Vector2<usize>, target: Vector2<usize>, allowed_item: &T) -> Option<Grid<usize>> {
+        let mut queue: BinaryHeap<Node> = BinaryHeap::new();
+        queue.push(Node {
+            position: start,
+            priority: 0,
+            cost: 0
+        });
+
+        let mut visited = vec![usize::MAX; self.grid.len()];
+        visited[self.calculate_index(&start)] = 0;
+
+        while !queue.is_empty() {
+            let node = queue.pop().unwrap();
+            if node.position == target {
+                return Some(Grid {
+                    height: self.height,
+                    width: self.width,
+                    grid: visited,
+                });
+            }
+
+            for neighbor in self.neighbour_squares(&node.position) {
+                let idx = self.calculate_index(&neighbor);
+                if &self.grid[idx] == allowed_item && visited[idx] == usize::MAX  {
+                    visited[idx] = node.cost + 1;
                     queue.push(Node {
                         position: neighbor,
                         priority: node.cost + 1,
