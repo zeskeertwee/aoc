@@ -5,6 +5,9 @@ edition = "2021"
 authors = ["Jasper Fortuin <zeskeertwee@gmail.com>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "runner"
+path = "src/runner.rs"
 
 [profile.test]
 # some solutions rely on underflows of usize Vector2's, so they break with this on

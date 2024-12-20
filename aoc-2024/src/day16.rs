@@ -2,12 +2,12 @@ use std::cmp::Ordering;
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 use aoc_runner_derive::{aoc, aoc_generator};
-use aoclib::aoc_test;
+use aoclib::{aoc_day, aoc_test};
 use aoclib::grid::Grid;
 use aoclib::vec2::{Direction, Vector2, DIRECTIONS};
 use fxhash::{FxHashMap, FxHashSet};
 
-struct Input {
+pub struct Input {
     grid: Grid<char>,
     starting_pos: Vector2<usize>,
     target_pos: Vector2<usize>
@@ -130,3 +130,5 @@ fn bfs_maze2(grid: &Grid<char>, starting_pos: Vector2<usize>, starting_dir: Dire
 aoc_test!(test_day16_sample1, "../samples/day16-1.txt", 7036, 45);
 aoc_test!(test_day16_sample2, "../samples/day16-2.txt", 11048, 64);
 aoc_test!(test_day16, "../input/2024/day16.txt", 109516, 568);
+
+aoc_day!(Day16, Input);
