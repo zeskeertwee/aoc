@@ -124,7 +124,7 @@ fn parse_input(input: &str) -> (Machine, Vec<u8>) {
     ];
 
     let numbers: Vec<u8> = lines[4][9..].trim().split(',').map(|v| v.parse::<u8>().unwrap()).collect();
-    let instructions = numbers.array_chunks().map(|[a, b]| {
+    let instructions = numbers.as_chunks().0.into_iter().map(|[a, b]| {
         (Instruction::from(*a), ComboOperand::from(*b))
     }).collect();
 

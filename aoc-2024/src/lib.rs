@@ -1,5 +1,4 @@
 #![feature(let_chains)]
-#![feature(array_chunks)]
 
 use aoc_runner_derive::aoc_lib;
 
