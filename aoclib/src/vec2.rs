@@ -94,6 +94,22 @@ impl Add<Vector2<usize>> for Direction {
     }
 }
 
+impl Add<Vector2<isize>> for Direction {
+    type Output = Vector2<isize>;
+
+    fn add(self, rhs: Vector2<isize>) -> Self::Output {
+        let mut r = rhs.clone();
+        match self {
+            Direction::Up => r.y -= 1,
+            Direction::Right => r.x += 1,
+            Direction::Down => r.y += 1,
+            Direction::Left => r.x -= 1
+        }
+
+        r
+    }
+}
+
 #[test]
 fn test_vec2_int() {
     let v1 = Vector2 { x: 1, y: 1 };
