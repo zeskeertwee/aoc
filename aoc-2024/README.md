@@ -24,7 +24,7 @@ The goal is to solve all AoC 2024 exersises (both parts) in <1000ms. Preferably 
 | 19  | 68.86μs  | 412.7μs  | FxHash, Rayon          |
 | 20  | 2.042ms  | 14.14ms  | Rayon                  |
 | 21  |          |          |                        |
-| 22  |          |          |                        |
+| 22  | 665.6μs  |          | Rayon (part 1)         |
 | 23  |          |          |                        |
 | 24  |          |          |                        |
 | 25  |          |          |                        |
