@@ -23,8 +23,8 @@ fn find_hash_pattern<F: Fn([u8; 16]) -> bool + Sync>(input: &str, cond: F) -> us
     let mut base_hasher = Md5::new();
     base_hasher.update(input.to_string().as_bytes());
 
-    (0..usize::MAX).into_par_iter()
-        .find_first(|n| {
+    (0..usize::MAX).into_iter()
+        .find(|n| {
             let mut hasher = Md5::new();
             base_hasher.clone_into(&mut hasher);
             hasher.update(n.to_string().as_bytes());
