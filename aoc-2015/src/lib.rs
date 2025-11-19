@@ -2,6 +2,7 @@
 #![feature(iter_map_windows)]
 use aoc_runner_derive::aoc_lib;
 
+mod day6;
 mod day5;
 mod day4;
 mod day3;
