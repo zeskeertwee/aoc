@@ -81,3 +81,5 @@ fn part2(input: &[Instruction]) -> usize {
 
     grid.grid.iter().sum::<isize>() as usize
 }
+
+aoc_test!(test_day6, "../input/2015/day6.txt", 569999, 17836115);
