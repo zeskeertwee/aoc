@@ -1,5 +1,6 @@
 use aoc_runner_derive::{aoc, aoc_generator};
 use aoclib::aoc_test;
+use rayon::prelude::*;
 
 #[aoc_generator(day8)]
 fn parse_input(input: &str) -> Vec<String> {
@@ -10,7 +11,7 @@ fn parse_input(input: &str) -> Vec<String> {
 
 #[aoc(day8, part1)]
 fn part1(input: &[String]) -> usize {
-    input.iter()
+    input.par_iter()
         .map(|l| {
             let mut num_bytes = 0;
             let chars: Vec<char> = l.chars().collect();
@@ -46,7 +47,7 @@ fn part1(input: &[String]) -> usize {
 
 #[aoc(day8, part2)]
 fn part2(input: &[String]) -> usize {
-    input.iter()
+    input.par_iter()
         .map(|l| {
             let chars: Vec<char> = l.chars().collect();
             let num_char = chars.len();
