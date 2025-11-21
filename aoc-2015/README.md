@@ -6,11 +6,11 @@
 | 3   | 106.5μs | 123.9μs | FxHash        |
 | 4   | 32.00ms | 130.2ms | Md5**         |
 | 5   | 58.64μs | 96.82μs | FxHash, Rayon |
-| 6   |         |         |               |
-| 7   |         |         |               |
-| 8   |         |         |               |
-| 9   |         |         |               |
-| 10  |         |         |               |
+| 6   | 16.79ms | 25.84ms |               |
+| 7   | 704.3μs | 1.410ms | FxHash        |
+| 8   | 26.88μs | 29.34μs | Rayon         |
+| 9   | 1.974ms | 44.35ms | FxHash        |
+| 10  | 1.467ms | 21.43ms |               |
 | 11  |         |         |               |
 | 12  |         |         |               |
 | 13  |         |         |               |
@@ -27,7 +27,6 @@
 | 24  |         |         |               |
 | 25  |         |         |               |
 
-\* = Part 1/2 solution require (nearly) the same computation, can both be solved in this time
 \*\* = TODO: Implement MD5 in aoclib
 
 All benchmarked on `Ryzen 7 3700X, 48GB (2 x 8GB, 2 x 16GB) 3200MT/s` desktop using `cargo aoc bench -d [day]`.
