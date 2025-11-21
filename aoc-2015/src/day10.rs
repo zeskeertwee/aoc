@@ -9,7 +9,7 @@ fn parse_input(input: &str) -> Vec<u8> {
 fn part1(input: &[u8]) -> usize {
     let mut number = input.to_vec();
 
-    for i in 0..40 {
+    for _ in 0..40 {
         number = apply_process(&number);
     }
 
@@ -20,7 +20,7 @@ fn part1(input: &[u8]) -> usize {
 fn part2(input: &[u8]) -> usize {
     let mut number = input.to_vec();
 
-    for i in 0..50 {
+    for _ in 0..50 {
         number = apply_process(&number);
     }
 

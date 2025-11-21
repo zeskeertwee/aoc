@@ -1,6 +1,6 @@
 use aoc_runner_derive::{aoc, aoc_generator};
 use aoclib::aoc_test;
-use fxhash::{FxHashMap, FxHashSet};
+use fxhash::FxHashMap;
 use rayon::prelude::*;
 
 #[aoc_generator(day5)]
@@ -25,7 +25,7 @@ fn part2(input: &[String]) -> usize {
 
             s.chars()
                 .enumerate()
-                .map_windows(|[(i1, c1), (i2, c2)]| {
+                .map_windows(|[(i1, c1), (_, c2)]| {
                     if let Some(v) = map.get(&[*c1, *c2]) {
                         if v + 1 != *i1 {
                             // We found the same pattern again (non-overlapping)

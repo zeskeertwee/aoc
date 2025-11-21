@@ -2,7 +2,6 @@ use aoc_runner_derive::{aoc, aoc_generator};
 use aoclib::aoc_test;
 use md5::{Md5, Digest};
 use std::ops::Fn;
-use rayon::prelude::*;
 
 #[aoc_generator(day4)]
 fn parse_input(input: &str) -> String {
@@ -19,7 +18,7 @@ fn part2(input: &str) -> usize {
     find_hash_pattern(input, |hash| hash[0] == 0 && hash[1] == 0 && hash[2] == 0)
 }
 
-fn find_hash_pattern<F: Fn([u8; 16]) -> bool + Sync>(input: &str, cond: F) -> usize {
+fn find_hash_pattern<F: Fn([u8; 16]) -> bool>(input: &str, cond: F) -> usize {
     let mut base_hasher = Md5::new();
     base_hasher.update(input.to_string().as_bytes());
 
