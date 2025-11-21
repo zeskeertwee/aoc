@@ -4,6 +4,8 @@ use std::hash::Hash;
 use std::collections::BinaryHeap;
 use rustc_hash::{FxHashMap, FxHashSet};
 
+// TODO: use a matrix for costs instead of hashmap
+
 pub struct Graph<T, C> {
     // src, edge
     pub edges: FxHashMap<T, Vec<Edge<T, C>>>,
