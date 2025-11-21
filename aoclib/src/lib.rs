@@ -2,6 +2,7 @@ pub mod vec2;
 pub mod grid;
 pub mod mat2;
 pub mod memoizer;
+pub mod graph;
 
 pub use bitvec;
 
