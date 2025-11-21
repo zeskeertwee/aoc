@@ -135,7 +135,7 @@ impl<T: Eq + Hash + Clone, C: AddAssign<C> + PartialOrd + PartialEq + Ord + Defa
             }
 
             for edge in self.edges.get(&path.position).unwrap() {
-                if edge.src == path.position && !path.visited.contains(&edge.dst) {
+                if !path.visited.contains(&edge.dst) {
                     // Move to the new position via the edge
                     let mut new_path = path.clone();
                     new_path.visited.insert(new_path.position);
