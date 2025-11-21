@@ -2,10 +2,11 @@ use std::cmp::{Eq, Ordering, Reverse};
 use std::ops::AddAssign;
 use std::hash::Hash;
 use std::collections::BinaryHeap;
-use rustc_hash::FxHashSet;
+use rustc_hash::{FxHashMap, FxHashSet};
 
 pub struct Graph<T, C> {
-    pub edges: Vec<Edge<T, C>>,
+    // src, edge
+    pub edges: FxHashMap<T, Vec<Edge<T, C>>>,
     pub nodes: Vec<T>
 }
 
@@ -62,7 +63,14 @@ impl<T: Clone + Hash + Eq, C: Copy> Graph<T, C> {
                 cost: edge.cost
             }, edge])
             .flatten()
-            .collect();
+            .fold(FxHashMap::default(), |mut acc: FxHashMap<T, Vec<Edge<T, C>>>, edge| {
+                if let Some(list) = acc.get_mut(&edge.src) {
+                    list.push(edge);
+                } else {
+                    acc.insert(edge.src.clone(), vec![edge]);
+                }
+                acc
+            });
         let nodes = get_all_nodes(&edges);
 
         Self {
@@ -71,18 +79,20 @@ impl<T: Clone + Hash + Eq, C: Copy> Graph<T, C> {
     }
 
     pub fn new(edges: Vec<Edge<T, C>>) -> Self {
+        let edges = edges.into_iter().fold(FxHashMap::default(), |mut acc: FxHashMap<T, Vec<Edge<T, C>>>, edge| {
+            if let Some(list) = acc.get_mut(&edge.src) {
+                list.push(edge);
+            } else {
+                acc.insert(edge.src.clone(), vec![edge]);
+            }
+            acc
+        });
         Self { nodes: get_all_nodes(&edges), edges }
     }
 }
 
-pub fn get_all_nodes<T: Clone + Hash + Eq, C: Clone>(edges: &Vec<Edge<T, C>>) -> Vec<T> {
-    let mut nodes = FxHashSet::default();
-    for i in edges {
-        nodes.insert(i.src.clone());
-        nodes.insert(i.dst.clone());
-    }
-
-    nodes.into_iter().collect()
+pub fn get_all_nodes<T: Clone + Hash + Eq, C: Clone>(edges: &FxHashMap<T, Vec<Edge<T, C>>>) -> Vec<T> {
+    edges.keys().map(|k| k.clone()).collect()
 }
 
 impl<T: Eq + Hash + Clone, C: AddAssign<C> + PartialOrd + PartialEq + Ord + Default + Clone + Copy> Graph<T, C> {
@@ -105,7 +115,7 @@ impl<T: Eq + Hash + Clone, C: AddAssign<C> + PartialOrd + PartialEq + Ord + Defa
                 return Some(path.cost);
             }
 
-            for edge in &self.edges {
+            for edge in self.edges.get(&path.position).unwrap() {
                 if edge.src == path.position && !path.visited.contains(&edge.dst) {
                     // Move to the new position via the edge
                     let mut new_path = path.clone();
@@ -143,7 +153,7 @@ impl<T: Eq + Hash + Clone, C: AddAssign<C> + PartialOrd + PartialEq + Ord + Defa
                 continue;
             }
 
-            for edge in &self.edges {
+            for edge in self.edges.get(&path.0.position).unwrap() {
                 if edge.src == path.0.position && !path.0.visited.contains(&edge.dst) {
                     // Move to the new position via the edge
                     let mut new_path = path.clone().0;
