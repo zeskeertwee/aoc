@@ -1,4 +1,5 @@
 use aoc_runner_derive::{aoc, aoc_generator};
+use aoclib::aoc_test;
 
 #[aoc_generator(day12)]
 fn parse_input(input: &str) -> Vec<char> {
@@ -24,11 +25,10 @@ fn part1(input: &[char]) -> isize {
 
 #[aoc(day12, part2)]
 fn part2(input: &[char]) -> isize {
-    get_object_sum(input, 0).0
+    get_object_sum(input, 0, false).0
 }
 
-fn get_object_sum(data: &[char], idx: usize) -> (isize, usize) {
-    dbg!(idx);
+fn get_object_sum(data: &[char], idx: usize, array: bool) -> (isize, usize) {
     let mut sum = 0;
     let mut red = false;
     let mut acc = vec![];
@@ -41,31 +41,28 @@ fn get_object_sum(data: &[char], idx: usize) -> (isize, usize) {
             acc.push(c);
             i += 1;
             continue;
-        } else if c == '{' {
-            let (a,b) = get_object_sum(data, i + 1);
+        } else if c == '{' || c == '[' {
+            let (a,b) = get_object_sum(data, i + 1, c == '[');
             sum += a;
-            i = b;
-
+            i = b - 1;
+        } else if c == '}' || c == ']' {
             if acc.len() > 0 {
-                dbg!(String::from_iter(&acc));
                 sum += String::from_iter(&acc).parse::<isize>().unwrap();
                 acc.clear();
             }
-        } else if c == '}' {
-            if red {
+
+            if red && !array {
                 return (0, i+1);
             } else {
                 return (sum, i + 1);
             }
         } else if c == 'r' && data[i+1] == 'e' && data[i+2] == 'd' {
-            // make sure that it's a value and not a key
-            if data[i+4] != ':' {
+            if data[i-1] == '"' && data[i+3] == '"' && data[i+4] != ':' {
                 red = true;
             }
         }
 
         if acc.len() > 0 {
-            dbg!(String::from_iter(&acc));
             sum += String::from_iter(&acc).parse::<isize>().unwrap();
             acc.clear();
         }
@@ -73,5 +70,7 @@ fn get_object_sum(data: &[char], idx: usize) -> (isize, usize) {
         i += 1;
     }
 
-    (if red { 0 } else { sum }, i)
+    (if red && !array { 0 } else { sum }, i)
 }
+
+aoc_test!(test_day12, "../input/2015/day12.txt", 156366, 96852);
