@@ -151,8 +151,8 @@ impl<T: Eq + Hash + Clone, C: AddAssign<C> + PartialOrd + PartialEq + Ord + Defa
         None
     }
 
-    /// finds the longest path visiting all nodes
-    pub fn find_longest_path_visiting_all(&self) -> C {
+    /// finds the longest path satisfying a condition
+    pub fn bfs_find_longest_path_length<F: Fn(&Path<T, C>, &Graph<T, C>) -> bool>(&self, cond: F) -> C {
         let mut graph = self.clone();
         let max_edge_cost = graph.edges.iter().map(|(_, edge)| edge).flatten().map(|v| v.cost).max().unwrap();
 
@@ -162,7 +162,7 @@ impl<T: Eq + Hash + Clone, C: AddAssign<C> + PartialOrd + PartialEq + Ord + Defa
             }
         }
 
-        let cost = graph.bfs_find_shortest_path_length(|path, graph| path.visited.len() + 1 == graph.nodes.len()).unwrap();
+        let cost = graph.bfs_find_shortest_path_length(cond).unwrap();
         (max_edge_cost * if let Ok(v) = C::try_from(graph.nodes.len() - 1) {
             v
         } else { panic!() }) - cost

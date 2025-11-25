@@ -36,7 +36,7 @@ fn part1(input: &Graph<u8, u16>) -> u16 {
 
 #[aoc(day9, part2)]
 fn part2(input: &Graph<u8, u16>) -> u16 {
-    input.find_longest_path_visiting_all()
+    input.bfs_find_longest_path_length(|path, graph| path.visited.len() + 1 == graph.nodes.len())
 }
 
 aoc_test!(test_day9, "../input/2015/day9.txt", 141, 736);
