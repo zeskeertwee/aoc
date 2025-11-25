@@ -11,14 +11,14 @@ macro_rules! aoc_test {
     ($name:ident, $input:literal, $part1:literal) => {
         #[test]
         fn $name() {
-            let input = parse_input(include_str!($input));
+            let input = parse_input(include_str!($input).trim());
             assert_eq!(part1(&input), $part1);
         }
     };
     ($name:ident, $input:literal, $part1:literal, $part2:literal) => {
         #[test]
         fn $name() {
-            let input = parse_input(include_str!($input));
+            let input = parse_input(include_str!($input).trim());
             assert_eq!(part1(&input), $part1);
             assert_eq!(part2(&input), $part2);
         }
