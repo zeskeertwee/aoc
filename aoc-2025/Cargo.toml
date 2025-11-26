@@ -1,0 +1,21 @@
+[package]
+name = "aoc-2025"
+version = "0.1.0"
+edition = "2024"
+authors = ["Jasper Fortuin <zeskeertwee@gmail.com>"]
+
+[profile.test]
+overflow-checks = false
+opt-level = 3
+
+[profile.dev]
+overflow-checks = false
+
+[dependencies]
+aoc-runner = "0.3.0"
+aoc-runner-derive = "0.3.0"
+rayon = "1.10.0"
+fxhash = "0.2.1"
+
+[dependencies.aoclib]
+path = "../aoclib"
