@@ -12,6 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: dtolnay/rust-toolchain@nightly
+
       # 1. Setup Rust cache
       - uses: actions/cache@v3
         with:
