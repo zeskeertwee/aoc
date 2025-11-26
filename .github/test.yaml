@@ -1,0 +1,90 @@
+name: AoC Tests (2015 & 2024)
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '15 5 * 12 *' # Daily at 05:15 UTC in December (releases at 05:00 UTC)
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # 1. Setup Rust cache
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+            # Cache target folders inside specific years if they aren't shared
+            aoc-2015/target/
+            aoc-2024/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      # 2. Cache Input Files
+      - name: Cache AoC Inputs
+        id: cache-inputs
+        uses: actions/cache@v3
+        with:
+          path: |
+            aoc-2015/input
+            aoc-2024/input
+          key: aoc-inputs-${{ github.run_number }}
+          restore-keys: |
+            aoc-inputs-
+
+      # 3. Download Missing Inputs
+      - name: Download Inputs
+        env:
+          SESSION: ${{ secrets.AOC_SESSION }}
+          USER_AGENT: "github.com/${{ github.repository }} by ${{ github.actor }}"
+        run: |
+          YEARS=("2015" "2024")
+
+          for year in "${YEARS[@]}"; do
+            # e.g.: aoc-2015/input/2015/day1.txt
+            target_dir="aoc-$year/input/$year"
+            mkdir -p "$target_dir"
+            
+            echo "Checking Year $year in $target_dir..."
+
+            for day in {1..25}; do
+              file_path="$target_dir/day$day.txt"
+
+              if [ ! -f "$file_path" ]; then
+                echo "Downloading Day $day ($year)..."
+                status_code=$(curl -s -w "%{http_code}" -o "$file_path" -A "$USER_AGENT" --cookie "session=$SESSION" "https://adventofcode.com/$year/day/$day/input")
+                
+                if [ "$status_code" -eq "404" ]; then
+                   rm "$file_path"
+                   echo "Day $day not unlocked yet."
+                   break 
+                elif [ "$status_code" -ne "200" ]; then
+                   echo "Failed to download Day $day. Status: $status_code"
+                   exit 1
+                fi
+                sleep 0.2
+              fi
+            done
+          done
+
+      # 4. Run tests for each year
+      - name: Run Cargo Test
+        run: |
+          YEARS=("2015" "2024")
+          
+          for year in "${YEARS[@]}"; do
+            echo "----------------------------------------"
+            echo "Running tests for aoc-$year..."
+            echo "----------------------------------------"
+            
+            # Enter the directory, run test, return to root
+            cd "aoc-$year"
+            cargo test
+            cd ..
+          done
