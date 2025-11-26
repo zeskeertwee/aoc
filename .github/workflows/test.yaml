@@ -1,4 +1,4 @@
-name: AoC Tests (2015 & 2024)
+name: AoC Tests
 
 on:
   push:
