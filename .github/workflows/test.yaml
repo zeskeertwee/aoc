@@ -36,6 +36,7 @@ jobs:
           path: |
             aoc-2015/input
             aoc-2024/input
+            aoc-2025/input
           key: aoc-inputs-${{ github.run_number }}
           restore-keys: |
             aoc-inputs-
@@ -46,7 +47,7 @@ jobs:
           SESSION: ${{ secrets.AOC_SESSION }}
           USER_AGENT: "github.com/${{ github.repository }} by ${{ github.actor }}"
         run: |
-          YEARS=("2015" "2024")
+          YEARS=("2015" "2024" "2025")
 
           for year in "${YEARS[@]}"; do
             # e.g.: aoc-2015/input/2015/day1.txt
@@ -78,7 +79,7 @@ jobs:
       # 4. Run tests for each year
       - name: Run Cargo Test
         run: |
-          YEARS=("2015" "2024")
+          YEARS=("2015" "2024" "2025")
           
           for year in "${YEARS[@]}"; do
             echo "----------------------------------------"
