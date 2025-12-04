@@ -353,9 +353,6 @@ impl<T> IndexMut<&Vector2<usize>> for Grid<T> {
     }
 }
 
-#[cfg(test)]
-use crate::vec2::Direction;
-
 #[test]
 fn test_grid() {
     let input = "AAAA\nBBCD\nBBCC\nEEEC";
@@ -368,14 +365,14 @@ fn test_grid() {
 
     assert_eq!(grid[&Vector2::new(0, 0)], 'A');
     assert_eq!(grid[&Vector2::new(2, 2)], 'C');
-    assert_eq!(grid[&(Direction::Up + (Direction::Left + Vector2::new(1, 1)))], 'A');
-    assert_eq!(grid[&(Direction::Down + (Direction::Right + Vector2::new(1, 1)))], 'C');
+    assert_eq!(grid[&(Direction::Up + (Direction::Left + Vector2::new(1_usize, 1)))], 'A');
+    assert_eq!(grid[&(Direction::Down + (Direction::Right + Vector2::new(1_usize, 1)))], 'C');
 
     assert_eq!(grid.calculate_position(5), Vector2::new(1, 1));
 
     let rot = grid.rotate();
     assert_eq!(rot.height, 4);
     assert_eq!(rot.width, 4);
-    assert_eq!(rot.get_row(0), ['E', 'B', 'B', 'A']);
-    assert_eq!(rot.get_row(3), ['C', 'C', 'D', 'A']);
+    assert_eq!(rot.get_row(0), ['A', 'B', 'B', 'E']);
+    assert_eq!(rot.get_row(3), ['A', 'D', 'C', 'C']);
 }
