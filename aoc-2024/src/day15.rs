@@ -46,7 +46,7 @@ fn part2(input: &Input) -> usize {
     let position = Vector2::new(input.starting_position.x * 2, input.starting_position.y);
     input.grid.iter_squares().for_each(|(c, pos)| {
         let new_pos_a = Vector2::new(pos.x * 2, pos.y);
-        let new_pos_b = new_pos_a + Vector2::new(1, 0);
+        let new_pos_b = new_pos_a + Vector2::new(1_usize, 0);
     
         match *c {
             '#' | '.' => {
