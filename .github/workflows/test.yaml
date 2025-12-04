@@ -3,8 +3,6 @@ name: AoC Tests
 on:
   push:
   pull_request:
-  schedule:
-    - cron: '15 5 * 12 *' # Daily at 05:15 UTC in December (releases at 05:00 UTC)
 
 jobs:
   test:
@@ -79,15 +77,15 @@ jobs:
       # 4. Run tests for each year
       - name: Run Cargo Test
         run: |
-          YEARS=("2015" "2024" "2025")
+          YEARS=("aoclib", "aoc-2015" "aoc-2024" "aoc-2025")
           
           for year in "${YEARS[@]}"; do
             echo "----------------------------------------"
-            echo "Running tests for aoc-$year..."
+            echo "Running tests for $year..."
             echo "----------------------------------------"
             
             # Enter the directory, run test, return to root
-            cd "aoc-$year"
+            cd "$year"
             cargo test
             cd ..
           done
