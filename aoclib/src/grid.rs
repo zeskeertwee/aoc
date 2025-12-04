@@ -3,7 +3,7 @@ use std::collections::BinaryHeap;
 use std::fmt::{Debug, Display};
 use std::ops::{Index, IndexMut};
 use bitvec::order::Lsb0;
-use crate::vec2::{Vector2, DIRECTIONS};
+use crate::vec2::{Vector2, DIRECTIONS, Direction};
 use bitvec::vec::BitVec;
 
 #[derive(Clone)]
@@ -65,11 +65,28 @@ impl<T> Grid<T> {
         })
     }
 
+
+    /// returns a list of the neighbor squares directly above/below/left/right
     pub fn neighbour_squares(&self, v: &Vector2<usize>) -> Vec<Vector2<usize>> {
         let mut neighbours = Vec::with_capacity(4);
 
         for dir in DIRECTIONS {
             let pos = dir + *v;
+            if self.is_inside(&pos) {
+                neighbours.push(pos);
+            }
+        }
+
+        neighbours
+    }
+
+    /// returns a list of the neighbor squares that are directly above/below/left/right and the ones diagonally above/below left/right
+    pub fn adjacent_neighbour_squares(&self, v: &Vector2<usize>) -> Vec<Vector2<usize>> {
+        let mut neighbours = self.neighbour_squares(v);
+        let diag_dir = [Direction::Up + Direction::Left, Direction::Up + Direction::Right, Direction::Down + Direction::Left, Direction::Down + Direction::Right];
+
+        for p in diag_dir {
+            let pos = *v + p;
             if self.is_inside(&pos) {
                 neighbours.push(pos);
             }

@@ -21,6 +21,14 @@ impl<T: Add<Output = T>> Add for Vector2<T> {
     }
 }
 
+impl Add<Vector2<isize>> for Vector2<usize> {
+    type Output = Vector2<usize>;
+
+    fn add(self, rhs: Vector2<isize>) -> Self::Output {
+        Vector2 { x: (self.x as isize + rhs.x) as usize, y: (self.y as isize + rhs.y) as usize }
+    }
+}
+
 impl<T: Sub<Output = T>> Sub for Vector2<T> {
     type Output = Vector2<T>;
 
@@ -76,6 +84,15 @@ impl Direction {
             Direction::Left => Direction::Right
         }
     }
+
+    pub fn to_vec(self) -> Vector2<isize> {
+        match self {
+            Direction::Up => Vector2::new(0, -1),
+            Direction::Right => Vector2::new(1, 0),
+            Direction::Left => Vector2::new(-1, 0),
+            Direction::Down => Vector2::new(0, 1)
+        }
+    }
 }
 
 impl Add<Vector2<usize>> for Direction {
@@ -107,6 +124,14 @@ impl Add<Vector2<isize>> for Direction {
         }
 
         r
+    }
+}
+
+impl Add<Direction> for Direction {
+    type Output = Vector2<isize>;
+
+    fn add(self, rhs: Direction) -> Self::Output {
+        self.to_vec() + rhs.to_vec()
     }
 }
 
