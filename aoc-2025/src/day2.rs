@@ -30,8 +30,6 @@ fn part1(input: &[RangeInclusive<u64>]) -> u64 {
 
 #[aoc(day2, part2)]
 fn part2(input: &[RangeInclusive<u64>]) -> u64 {
-    dbg!(integer_factorize(24));
-
     input.par_iter()
         .map(|r| r.to_owned().into_iter()
             .filter(|v| {
