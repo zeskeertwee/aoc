@@ -40,7 +40,7 @@ mod testfunc {
 
     const BOOL: AtomicBool = AtomicBool::new(false);
 
-    pub fn test_func(arg: &()) -> u8 {
+    pub fn test_func(_arg: &()) -> u8 {
         assert!(!BOOL.load(Ordering::Relaxed));
         BOOL.store(true, Ordering::Relaxed);
         42
