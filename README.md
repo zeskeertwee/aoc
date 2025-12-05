@@ -10,3 +10,4 @@ I only use:
 Benchmarks and library usage per day for each year:
 - [2015 Solutions](./aoc-2015/README.md)
 - [2024 Solutions](./aoc-2024/README.md)
+- [2025 Solutions](./aoc-2025/README.md)
