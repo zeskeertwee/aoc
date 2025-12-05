@@ -1,5 +1,3 @@
-#![feature(let_chains)]
-
 use aoc_runner_derive::aoc_lib;
 
 // TODO: allow result passing from part 1 to 2

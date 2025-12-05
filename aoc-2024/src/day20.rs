@@ -60,19 +60,4 @@ fn find_cheats(input: &Input, max_cheat_len: usize) -> usize {
     }).sum()
 }
 
-fn print_grid(grid: &Grid<usize>) {
-    dbg!(grid);
-    for y in 0..grid.height {
-        for x in 0..grid.width {
-            let v = grid[&Vector2::new(x, y)];
-            if v < usize::MAX {
-                print!(" {} ", v);
-            } else {
-                print!(" # ");
-            }
-        }
-        println!();
-    }
-}
-
 aoc_test!(test_day20, "../input/2024/day20.txt", 1358, 1005856);

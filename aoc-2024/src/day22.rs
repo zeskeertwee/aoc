@@ -42,7 +42,7 @@ fn part2_new(input: &[usize]) -> usize {
 
             //dbg!(&last_diffs);
 
-            let mut entry = map.entry(last_diffs).or_insert(0);
+            let entry = map.entry(last_diffs).or_insert(0);
             if new_price > *entry {
                 *entry = new_price;
             }
