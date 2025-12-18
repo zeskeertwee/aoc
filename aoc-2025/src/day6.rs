@@ -1,5 +1,6 @@
 use aoc_runner_derive::{aoc, aoc_generator};
 use aoclib::aoc_test;
+use rayon::prelude::*;
 
 #[derive(Debug)]
 struct Number {
@@ -81,7 +82,7 @@ fn part1(input: &[(Vec<Number>, char)]) -> u64 {
 
 #[aoc(day6, part2)]
 fn part2(input: &[(Vec<Number>, char)]) -> u64 {
-    input.iter()
+    input.par_iter()
         .map(|(n, op)| {
             let longest_num = n.iter().map(|n| n.v.ilog10() + 1).max().unwrap() as usize;
             let mut numbers: Vec<u64> = vec![0; longest_num];
