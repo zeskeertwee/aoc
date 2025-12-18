@@ -4,12 +4,12 @@ The goal is to solve all AoC 2025 exersises (both parts) in <500ms.
 | Day | Part 1  | Part 2  | Libraries      |
 |-----|---------|---------|----------------|
 | 1   | 8.274μs | 11.81μs |                |
-| 2   | 2.601ms | 128.9ms | Rayon          |
-| 3   |         |         | Rayon (part 2) |
+| 2   | 2.601ms |         | Rayon          |
+| 3   | 18.12μs | 42.03μs | Rayon (part 2) |
 | 4   | 1.066ms | 23.99ms |                |
-| 5   | 69.86μs | 38.04μs | Rayon (part 2) |
-| 6   |         |         |                |
-| 7   |         |         |                |
+| 5   | 69.86μs | 38.04μs | Rayon (part 1) |
+| 6   | 5.741μs | 56.16μs | Rayon (part 2) |
+| 7   | 163.7μs | 110.5μs | FxHash         |
 | 8   |         |         |                |
 | 9   |         |         |                |
 | 10  |         |         |                |
